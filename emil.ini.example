@@ -1,0 +1,8 @@
+[_]
+; defaults
+
+; smtp user connect
+transport="smtp://SMTP_USERNAME:SMTP_PASSWD@SMPT_HOST:465"
+
+; smtp sender
+from="service@my-project.de"
