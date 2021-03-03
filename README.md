@@ -11,6 +11,6 @@ self hosted email service
     # type: contact
     # POST submission/{org}/send/{type}
     curl --header "Content-Type: application/json" \
-      http://acme.com/emil/acme/send/welcome \
-      -d '{"name":"strange guy","email":"latoya@myspace.com","message":"i like your website, please call back"}'
+      http://acme.com/emil/email/acme/niceproject/send/welcome \
+      -d '{"name":"strange guy","to":"latoya@myspace.com","confirm_token":"mM-Juhu99-EEnlf"}'
 
