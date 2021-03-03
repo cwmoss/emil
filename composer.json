@@ -1,0 +1,13 @@
+{
+    "require": {
+        "bramus/router": "^1.4",
+        "guzzlehttp/guzzle": "^7.0",
+        "adhocore/jwt": "^1.0",
+		  "ramsey/uuid": "^4.0",
+        "vlucas/phpdotenv": "^5.3",
+        "paragonie/easydb": "^2",
+        "zordius/lightncandy": "dev-master",
+        "mnapoli/front-yaml": "^1.8",
+        "swiftmailer/swiftmailer": "^6.0"
+    }
+}

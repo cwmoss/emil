@@ -1,0 +1,7 @@
+vendor/
+logs/
+composer.lock
+node_modules/
+.quasar/
+.env
+.DS_Store
