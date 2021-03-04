@@ -4,7 +4,8 @@ use api\templates;
 use twentyseconds\mailer;
 
 // list($post, $raw) = get_json_req();
-$data = get_json_req();
+if($_SERVER['REQUEST_METHOD']=="POST")
+    $data = get_json_req();
 
 
 dbg("+++ incoming +++ ");
