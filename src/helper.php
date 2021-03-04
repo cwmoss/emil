@@ -64,3 +64,41 @@ function gen_password($len=15){
 /*
 password_verify ( string $password , string $hash )
 */
+
+function normalize_files_array($files = []) {
+
+    $normalized_array = [];
+
+    foreach($files as $index => $file) {
+
+        if (!is_array($file['name'])) {
+            $normalized_array[$index][] = $file;
+            continue;
+        }
+
+        foreach($file['name'] as $idx => $name) {
+            $normalized_array[$index][$idx] = [
+                'name' => $name,
+                'type' => $file['type'][$idx],
+                'tmp_name' => $file['tmp_name'][$idx],
+                'error' => $file['error'][$idx],
+                'size' => $file['size'][$idx]
+            ];
+        }
+
+    }
+
+    return $normalized_array;
+}
+
+function stream_to_file($name){
+  $tmpfname = tempnam(sys_get_temp_dir(), 'emil-');
+  file_put_contents($tmpfname, file_get_contents('php://input'));
+  return [
+    'name' => $name,
+    'type' => 'stream',
+    'tmp_name' => $tmpfname,
+    'error' => 0,
+    'size' => filesize($tmpfname)
+  ];
+}

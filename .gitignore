@@ -1,5 +1,8 @@
+templates
+emil.ini
 vendor/
 logs/
+draft/
 composer.lock
 node_modules/
 .quasar/

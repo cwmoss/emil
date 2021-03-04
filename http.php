@@ -30,7 +30,11 @@ $router->mount('/email', function() use ($router, $conf, $data) {
   
   $hdrs = $router->getRequestHeaders();
   
+  dbg("mount email");
+
   $router->post('/(\w+)/(\w+)/send/(\w+)', function($org, $project, $template) use($conf, $hdrs, $data) {
+
+    dbg("post email");
 
     $mailer = new mailer($conf['conf']['_']);
     $parser = new Mni\FrontYAML\Parser();
@@ -51,25 +55,48 @@ $router->mount('/email', function() use ($router, $conf, $data) {
 
 
 $router->before('GET|POST', '/manage/.*', function() use ($router, $conf, $data) {
+
+  dbg("before manage");
+
   $hdrs = $router->getRequestHeaders();
 
   if(!$hdrs['x-any-admin'] || ($hdrs['x-any-admin']!=$_SERVER["XSTORE_ADMIN"])){
     dbg("+++ 401 +++ ");
 
-    header("HTTP/1.1 401 Unauthorized");
-    resp(['res'=>'fail', 'msg'=>'Unauthorized']);
+   # header("HTTP/1.1 401 Unauthorized");
+   # resp(['res'=>'fail', 'msg'=>'Unauthorized']);
 
-    exit;
+   # exit;
   }
 });
 
 $router->mount('/manage', function() use ($router, $conf, $data) {
   
   dbg("+++ manage +++ ");
-  
+  dbg($conf);
 
-  $api = new templates;
+  $api = new templates($conf['conf']);
   
+  $router->get('/(\w+)/', function($org) use($api, $conf, $hdrs, $data) {
+      resp($api->get_projects($org));
+  });
+
+  $router->get('/(\w+)/(\w+)/', function($org, $project) use($api, $conf, $hdrs, $data) {
+      resp($api->get_templates($org, $project));
+  });
+
+  $router->post('/(\w+)/(\w+)/upload', function($org, $project) use($api, $conf, $hdrs, $data) {
+      resp($api->upload($org, $project));
+  });
+
+  $router->put('/(\w+)/(\w+)/upload/([\w.]+)', function($org, $project, $name) use($api, $conf, $hdrs, $data) {
+
+    dbg("PUT", $name, file_get_contents('php://input'), $_FILES);
+    resp([]);
+
+    #  resp($api->upload_stream($org, $project, $name));
+  });
+
   $router->post('/org/(\w+)/([-\w\d]+)', function($meth, $name) use($api, $hdrs, $data) {
 
       $data = get_json_req();

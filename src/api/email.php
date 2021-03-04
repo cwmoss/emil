@@ -22,7 +22,12 @@ class email{
         $subject = $this->processor->process_string($subject, $data);
         $data['subject'] = $subject;
         
-        $this->mailer->send($views, $data);
+        try{
+            $this->mailer->send($views, $data);
+        }catch(throwable $e){
+            return ['err'=>$e->getTraceAsString()];
+        }
+        
         
         return ['res'=>'ok sent'];
     }

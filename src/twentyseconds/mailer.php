@@ -90,6 +90,17 @@ class mailer{
 	         $m->addPart($body, 'text/plain');
 	      }elseif($type=='html'){
 	        
+	        $repl = [];
+	        if($views['embeds']) foreach($views['embeds'] as $k=>$embed){
+	        		if(!file_exists($embed)) continue;
+	        		
+	        		$img = \Swift_Image::fromPath($embed);
+	        		$repl[$k] = 'cid:'.$img->getId();
+	        		$m->attach($img);
+	        }
+
+	        if($repl) $body = str_replace(array_keys($repl), $repl, $body);
+
 				#foreach(self::embed() as $cid => $embed){
 	   		#	$m->attach($embed);
 	   		#}

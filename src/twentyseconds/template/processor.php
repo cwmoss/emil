@@ -22,6 +22,7 @@ class processor{
 	*/
 	public $tfiles = [];
 	public $layouts = [];
+	public $embeds = [];
 
 	public $types = ['txt', 'html'];
 
@@ -77,17 +78,21 @@ class processor{
 		$base = $this->basedir;
 
 		$layoutname = $data['layout']?:$this->tfiles['txt']['d']['layout']?:$this->opts['layout'];
-		if($layoutname) $layoutname = '_'.$layoutname;
+		if($layoutname) $layoutname = '__'.$layoutname;
+
+		
 
 		foreach($this->tfiles as $type=>$tpl){
 
-			if($layoutname){
+			if($layoutname && file_exists($base.'/'.$layoutname.'.'.$type)){
 				$src = sprintf("{{#> %s }}\n%s\n{{/ %s }}", $layoutname, $tpl['t'], $layoutname);
 			}else{
 				$src = $tpl['t'];
 			}
 			
 			print "source: $src\n";
+
+			$processor = $this;
 
 			$this->tfiles[$type]['r'] = LightnCandy::compile($src, array(
 			    'partialresolver' => function ($cx, $name) use($base, $type){
@@ -100,24 +105,54 @@ class processor{
 			        }
 			        return "[partial (file:$fname) not found]";
 			    },
+			    'helpers' => array(
+		        'embed' => function ($context, $options)use($processor){
+		            // im compile step nix tun,
+		        		// erst im runstep wird die embedliste produziert
+		        		return $context;
+		        }
+		    	),
 			     'flags' => LightnCandy::FLAG_ERROR_LOG | LightnCandy::FLAG_RUNTIMEPARTIAL
 				)
 			);
 		}
+		
 		return $this;
 	}
 
 	function run($data){
 		$this->stage[] = "run";
 		$base = $this->basedir;
+		$processor = $this;
 
-		$layoutname = $data['layout'];
-
+		print_r($data);
 		$res = [];
 		foreach($this->tfiles as $type=>$tpl){
 			$renderer = eval($tpl['r']);
-			$res[$type] = $renderer($data);
+			$res[$type] = $renderer($data, [
+				'helpers' => array(
+		        'embed' => function ($context, $options)use($processor){
+		            $out = '';
+		            $data = $options['data'];
+
+		            
+		            $file = $processor->basedir.'/'.$context;
+		            $hash = 'embed-'.md5($file).'-embed';
+		            $processor->embeds[$hash] = $file;
+		            dbg("++ embed runtime", $context, $hash, $file);
+		            #foreach ($context as $idx => $cx) {
+		            #    $data['index'] = $idx;
+		            #    $out .= $options['fn']($cx, array('data' => $data));
+		            #}
+
+		            return $hash;
+		        }
+		    	),
+			]);
 		}
+		dbg("++ embedliste", $this->embeds);
+
+		$res['embeds'] = $this->embeds;
 		return $res;
 	}
 
