@@ -9,4 +9,5 @@ node_modules/
 .quasar/
 .env
 .netrc
+.htaccess
 .DS_Store

@@ -6,7 +6,7 @@ var_dump($conf);
 
 dbg("+++ start +++ ");
 
-$BASE_URL=$_SERVER['SCRIPT_NAME'].'/';
+#$BASE_URL=$_SERVER['SCRIPT_NAME'].'/';
 
 require_once(__DIR__."/../http.php");
 

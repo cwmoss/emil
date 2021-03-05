@@ -35,7 +35,31 @@ foreach($writeable as $name => $dir){
 		continue;
 	}
 
-	print "\n";
+	print "... ok\n";
 }
 
+$msecret = $secret?:"your-admin-secret-insert-here";
 
+$msg = <<<EMSG
+	
+	/etc, /logs and /templates must be writeable by the server, please check
+
+	next you should enter your SMTP details in .env file
+
+	you can start by creating an organization ("acme")
+
+	curl -v http://localhost/where-is-your-dir/index.php/admin/create/acme -X POST -H "X-Emil-Admin: {$msecret}"
+
+	this will create a api key for acme plus some templates to get startet
+	you can now send a message ("welcome") to yourself like this:
+
+	curl -v http://localhost/where-is-your-dir/index.php/send/acme/welcome -X POST \
+		-H "X-Emil-Api: acme-api-key-insert-here" \
+		-d '{"to":"youremail@yourserver.net","from":"youremail@yourserver.net",{"d":{"name":"strange guy"}}'
+
+	have fun!  
+
+
+EMSG;
+
+print $msg;
