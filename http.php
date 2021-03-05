@@ -10,7 +10,7 @@ if($_SERVER['REQUEST_METHOD']=="POST")
     $data = get_json_req();
 
 
-dbg("+++ incoming +++ ");
+dbg("+++ incoming +++ ", $_SERVER['REQUEST_METHOD'], $data);
 
 error_reporting(E_ALL & ~E_NOTICE);
 

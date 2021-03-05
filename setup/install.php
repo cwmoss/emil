@@ -57,7 +57,7 @@ $msg = <<<EMSG
 
 	curl -v localhost:1199/send/acme/welcome -X POST \
 		-H "X-Emil-Api: acme-api-key-insert-here" \
-		-d '{"to":"youremail@yourserver.net","from":"youremail@yourserver.net",{"d":{"name":"strange guy"}}'
+		-d '{"to":"youremail@yourserver.net","from":"youremail@yourserver.net","name":"strange guy"}'
 
 	have fun!  
 

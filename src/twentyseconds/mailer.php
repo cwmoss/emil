@@ -80,7 +80,8 @@ class mailer{
 	public function send($views, $data=array()){
 		#var_dump($views); exit;
 	   $hdrs = $this->header_from_data($data);
-	
+	    dbg("mail headers", $hdrs);
+	    
 	   $m=new \Swift_Message;
 
 	   foreach($views as $type=>$body){

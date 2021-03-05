@@ -16,6 +16,8 @@ class email{
 // xorc\mailer::send('register', ['to'=>$this->registration->email], ['u'=>$this->registration]);
 
     function send($template, $data, $hdrs){
+        dbg("++ send data", $data);
+        
         $views = $this->processor->process($template, $data);
 
         $subject = $this->processor->get_data("subject")??$data['subject'];
