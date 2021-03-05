@@ -28,7 +28,7 @@ this service supports multiple tenants `orgs`. tenants can have multiple `projec
       -d '{"name":"strange guy","to":"latoya@myspace.com","confirm_token":"mM-Juhu99-EEnlf"}'
 
     # without project and with basic auth -u api:organization-api-key
-	 curl -v http://localhost:1199/send/rw/welcome \
+	 curl -v http://localhost:1199/send/acme/welcome \
 	   -u api:9ecc433c... \
 	   -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}' -H "X-Emil-Api: 9ecc433c..."
 
@@ -69,7 +69,9 @@ Upload (multiple) Templates
 
 `POST /manage/ORG/PROJECT`
 
-	curl http://localhost:1199/manage/ORG/PROJECT/upload -F "u[]=@welcome.html" -F "u[]=@welcome.txt"  -F "u[]=@logo.png" -F "u[]=@__default.html"
+	curl http://localhost:1199/manage/ORG/PROJECT/upload \
+		-F "u[]=@welcome.html" -F "u[]=@welcome.txt" \
+		-F "u[]=@logo.png" -F "u[]=@__default.html"
 
 Upload single Template
 
