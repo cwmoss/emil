@@ -4,6 +4,12 @@ microservice for transactional email
 
 self hosted email service
 
+## goals
+
+most of my apps require sending emails. while migrating to the cloud stack, i felt the need to have a email service via http that works the same way as my old in-app functions. most of time i don't need most of the functionality of the big boys' services. so i don't want to subscribe to some service just to be able to send a bunch of mails a month. what i needed was templating. having a single layout for all html emails of one project. 
+
+so you can't send a raw email here. everything is based on prepared templates.
+
 ## example request
 
     # endpoint of service: http://acme.com/emil
@@ -20,18 +26,61 @@ self hosted email service
 	   -u api:9ecc433c... \
 	   -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}' -H "X-Emil-Api: 9ecc433c..."
 
-## Quick Start
+## quick start
 
 	 git clone https://github.com/cwmoss/emil.git
 	 cd emil
 	 composer install
 	 # follow the instructions
 
-## 4 different ways of configuring your server
+
+
+## Templates
+
+Template Engine is [LightnCandy](https://github.com/zordius/lightncandy) -- handlebars for php
+
+### Template Naming Conventions
+
+* Layout templates starts with `__` (two underscores)
+* Partials starts with `_` (one underscore)
+* Message Templates starts with lowercase character
+
+## Authorization
+
+all admin actions `/admin` must be authorized by either a http header `X-Emil-Admin` containing the admin secret or the http basic auth header with username `admin` and the admin secret as password.
+
+all email sending `/send` or management `/manage` api actions must be authorized by either a http header `X-Emil-Api` containing the organizations secret or the http basic auth header with username `api` and the organizations secret as password.
+
+## API
+
+
+### Send Message
+
+
+### Manage Templates
+
+Upload (multiple) Templates
+
+`POST /manage/ORG/PROJECT`
+
+	curl http://localhost:1199/manage/ORG/PROJECT/upload -F "u[]=@welcome.html" -F "u[]=@welcome.txt"  -F "u[]=@logo.png" -F "u[]=@__default.html"
+
+Upload single Template
+
+`PUT /manage/ORG/PROJECT/TEMPLATENAME.HTML`
+
+	curl http://localhost:1199/manage/ORG/PROJECT/upload/logo.png -T logo.png
+
+
+### Admin
+
+Create Organization
+
+## 5 different ways of configuring your server
 
 ### 1/ php server mode (ONLY FOR DEVELOPMENT)
 
-all the examples are refering to this
+all the examples are refering to this setup, since this is the easiest way for development
 
 	 `php -S localhost:1199 -t public/`
 
@@ -86,44 +135,6 @@ all the examples are refering to this
 	 http://localhost/emil/admin/orgs
 
 there are certainly more combinations that are possible. just remember: dont use `.env` files in production. use real environment variables via nginx/apache virtuals host, docker, apache .htaccess etc.
-
-## Templates
-
-Template Engine is handlebars for php
-
-### Template Naming Conventions
-
-* Layout templates starts with `__` (two underscors)
-* Partials starts with `_` (one underscore)
-* Message Templates starts with lowercase character
-
-
-## API
-
-
-### Send Message
-
-
-### Manage Templates
-
-Upload (multiple) Templates
-
-`POST /manage/ORG/PROJECT`
-
-	curl http://localhost:1199/manage/ORG/PROJECT/upload -F "u[]=@welcome.html" -F "u[]=@welcome.txt"  -F "u[]=@logo.png" -F "u[]=@__default.html"
-
-Upload single Template
-
-`PUT /manage/ORG/PROJECT/TEMPLATENAME.HTML`
-
-	curl http://localhost:1199/manage/ORG/PROJECT/upload/logo.png -T logo.png
-
-
-### Admin
-
-Create Organization
-
-
 
 ## Credits
 
