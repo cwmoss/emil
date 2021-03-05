@@ -4,31 +4,39 @@ microservice for transactional email
 
 self hosted email service
 
-### example request
+## example request
 
     # endpoint of service: http://acme.com/emil
     # org: acme
     # project: niceproject
     # template: welcome
     # POST email/{org}/{project}/send/{template}
-    curl --header "Content-Type: application/json" \
-      http://acme.com/emil/email/acme/niceproject/send/welcome \
+    curl http://acme.com/emil/send/acme/niceproject/welcome \
+      -H "X-Emil-Api: 9ecc433c..."
       -d '{"name":"strange guy","to":"latoya@myspace.com","confirm_token":"mM-Juhu99-EEnlf"}'
 
+    # without project and with basic auth -u api:organization-api-key
+	 curl -v http://acme.com/emil/send/rw/welcome \
+	   -u api:9ecc433c... \
+	   -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}' -H "X-Emil-Api: 9ecc433c..."
 
-	 curl -v /send/rw/welcome -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}' -H "X-Emil-Api: 9ecc433c..."
+## Quick Start
 
+	 git clone https://github.com/cwmoss/emil.git
+	 cd emil
+	 composer install
+	 # follow the instructions
 
-### 4 different ways of configuring your server
+## 4 different ways of configuring your server
 
-#### 1/ no rewrites, everything exposed to webserver (ONLY FOR DEVELOPMENT)
+### 1/ no rewrites, everything exposed to webserver (ONLY FOR DEVELOPMENT)
 
 	 # your endpoint
 	 http://localhost/dev/projects/emil/public/index.php
 	 # example: list organizations
 	 http://localhost/dev/projects/emil/public/index.php/admin/orgs
 
-#### 2/ rewrites are active, everything exposed to webserver (ONLY FOR DEVELOPMENT)
+### 2/ rewrites are active, everything exposed to webserver (ONLY FOR DEVELOPMENT)
 
 	 # copy dot.htaccess to public/.htaccess
 	 cp dot.htacces public/.htaccess
@@ -38,7 +46,7 @@ self hosted email service
 	 # example: list organizations
 	 http://localhost/dev/projects/emil/public/admin/orgs
 
-#### 3/ rewrites are active, /public is exposed by webserver via link
+### 3/ rewrites are active, /public is exposed by webserver via link
 
 	 # copy dot.htaccess to public/.htaccess
 	 cp dot.htacces public/.htaccess
@@ -51,7 +59,7 @@ self hosted email service
 	 # example: list organizations
 	 http://localhost/emil/admin/orgs
 
-#### 4/ rewrites are active, /public is exposed by webserver via link, environment set in webserver config (RECOMMENDED FOR PRODUCTION)
+### 4/ rewrites are active, /public is exposed by webserver via link, environment set in webserver config (RECOMMENDED FOR PRODUCTION)
 
 	 # add rewrite rules in apache location section <Location /emil>...</Location>
 	 # add env in location section
@@ -95,7 +103,7 @@ Upload (multiple) Templates
 
 Upload single Template
 
-PUT /manage/ORG/PROJECT/TEMPLATENAME.HTML
+`PUT /manage/ORG/PROJECT/TEMPLATENAME.HTML`
 
 	curl http://localhost:8888/manage/ORG/PROJECT/upload/logo.png -T logo.png
 
@@ -106,5 +114,12 @@ Create Organization
 
 
 
+## Credits
 
-acme logo by [Mackenzie Child](http://acmelogos.com/)
+* swiftmailer/swiftmailer, sending emails
+* zordius/lightncandy, handlebars implementation for php
+* bramus/router, routing lib
+* vlucas/phpdotenv, dotenv for php
+* mnapoli/front-yaml, frontmatter parsing
+* starter templates, salted by ..., simpleresponsive by leemunroe/responsive-html-email-template 
+* acme logo by [Mackenzie Child](http://acmelogos.com/)
