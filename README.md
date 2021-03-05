@@ -6,9 +6,13 @@ self hosted email service
 
 ## goals
 
-most of my apps require sending emails. while migrating to the cloud stack, i felt the need to have a email service via http that works the same way as my old in-app functions. most of time i don't need most of the functionality of the big boys' services. so i don't want to subscribe to some service just to be able to send a bunch of mails a month. what i needed was templating. having a single layout for all html emails of one project. 
+most of my apps require sending emails. while migrating to the cloud stack, i felt the need to have an email service via http that works the same way as my old in-app functions that i can host myself. most of time i don't need most of the functionality of the big boys' services. so i don't want to subscribe to any service just to be able to send a bunch of mails a month. what i needed was templating. having a single layout for all html emails of one project. 
 
-so you can't send a raw email here. everything is based on prepared templates.
+you will need a SMTP account for sending.
+
+you will have to create templates.
+
+you can't send a raw email here. everything is based on prepared templates.
 
 ## example request
 
