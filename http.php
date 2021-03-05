@@ -114,7 +114,7 @@ $router->mount('/manage', function() use ($router, $conf, $data) {
 
   $router->put('/(\w+)/(\w+)/upload/([\w.]+)', function($org, $project, $name) use($api, $conf, $hdrs, $data) {
 
-    dbg("PUT", $name, file_get_contents('php://input'), $_FILES);
+    // dbg("PUT", $name, file_get_contents('php://input'), $_FILES);
     resp([]);
 
     #  resp($api->upload_stream($org, $project, $name));
