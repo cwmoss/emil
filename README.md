@@ -90,7 +90,7 @@ Create Organization
 
 all the examples are refering to this setup, since this is the easiest way for development
 
-	 `php -S localhost:1199 -t public/`
+	 php -S localhost:1199 -t public/
 
 	 # your endpoint
 	 http://localhost:1199
