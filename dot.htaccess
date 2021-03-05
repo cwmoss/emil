@@ -1,0 +1,9 @@
+# you can set your env here
+# SetEnv EMIL_MAIL_TRANSPORT smtp://...
+# SetEnv EMIL_ADMIN_KEY 449592d38c...
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]

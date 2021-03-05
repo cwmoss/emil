@@ -20,7 +20,7 @@ if($BASE_URL){
    $router->setBasePath($BASE_URL);
 }
 
-
+dbg("+++ server vars", $_SERVER);
 
 $router->get('/', function()use($req){
     dbg("index");

@@ -46,14 +46,16 @@ $msg = <<<EMSG
 
 	next you should enter your SMTP details in .env file
 
-	you can start by creating an organization ("acme")
+	you can start your local server now
+	php -S localhost:1199 -t public/
 
-	curl -v http://localhost/where-is-your-dir/index.php/admin/create/acme -X POST -H "X-Emil-Admin: {$msecret}"
+	you can start by creating an organization ("acme")
+	curl -v localhost:1199/admin/create/acme -X POST -H "X-Emil-Admin: {$msecret}"
 
 	this will create a api key for acme plus some templates to get startet
 	you can now send a message ("welcome") to yourself like this:
 
-	curl -v http://localhost/where-is-your-dir/index.php/send/acme/welcome -X POST \
+	curl -v localhost:1199/send/acme/welcome -X POST \
 		-H "X-Emil-Api: acme-api-key-insert-here" \
 		-d '{"to":"youremail@yourserver.net","from":"youremail@yourserver.net",{"d":{"name":"strange guy"}}'
 
