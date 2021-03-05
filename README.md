@@ -120,7 +120,7 @@ all the examples are refering to this setup, since this is the easiest way for d
 	 cp dot.htacces public/.htaccess
 
 	 # link /public to webserver-root/emil
-	 ln -S /Users/rw/dev/emil/public /usr/local/var/www/emil
+	 ln -s /Users/rw/dev/emil/public /usr/local/var/www/emil
 
 	 # your endpoint
 	 http://localhost/emil
@@ -135,7 +135,7 @@ all the examples are refering to this setup, since this is the easiest way for d
 	 # SetEnv EMIL_ADMIN_KEY 449592d38c...
 
 	 # link /public to webserver-root/emil
-	 ln -S /Users/rw/dev/emil/public /usr/local/var/www/emil
+	 ln -s /Users/rw/dev/emil/public /usr/local/var/www/emil
 
 	 # your endpoint
 	 http://localhost/emil
