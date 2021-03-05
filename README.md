@@ -17,3 +17,16 @@ self hosted email service
 
 
 curl -F "image[]=@file1.gif" -F "image[]=@file2.gif"  http://localhost:8888/web/Upload.php
+
+-F "u[]=@__twenty.html"
+
+
+find ./ -name '*' -type f -exec curl -u USERNAME:PASSWORD -T {} http://www.example.com/folder/{} \;
+
+
+
+9ecc433ceb0442256472acb00c1f262d76b702ecb2a93103e3ed0f67b13ae073
+
+curl -v http://localhost/dev/emil/public/index.php/send/rw/welcome -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}' -H "X-Emil-Api: 9ecc433ceb0442256472acb00c1f262d76b702ecb2a93103e3ed0f67b13ae073"
+
+acme logo by [Mackenzie Child](http://acmelogos.com/)

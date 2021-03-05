@@ -1,6 +1,8 @@
 <?php
 use api\email;
 use api\templates;
+use api\orgs;
+
 use twentyseconds\mailer;
 
 // list($post, $raw) = get_json_req();
@@ -26,15 +28,16 @@ $router->get('/', function()use($req){
 });
 
 
-$router->mount('/email', function() use ($router, $conf, $data) {
+
+$router->mount('/send', function() use ($router, $conf, $data) {
   
   $hdrs = $router->getRequestHeaders();
   
   dbg("mount email");
 
-  $router->post('/(\w+)/(\w+)/send/(\w+)', function($org, $project, $template) use($conf, $hdrs, $data) {
+  $router->post('/(\w+)/(\w+)/(\w+)', function($org, $project, $template) use($conf, $hdrs, $data) {
 
-    dbg("post email");
+    dbg("post project email");
 
     $mailer = new mailer($conf['conf']['_']);
     $parser = new Mni\FrontYAML\Parser();
@@ -51,22 +54,42 @@ $router->mount('/email', function() use ($router, $conf, $data) {
       resp($api->send($template, $data, $hdrs));
   });
 
+  $router->post('/(\w+)/(\w+)', function($org, $template) use($conf, $hdrs, $data) {
+
+    dbg("post email");
+
+    $mailer = new mailer($conf['conf']['_']);
+    $parser = new Mni\FrontYAML\Parser();
+
+    $processor = new twentyseconds\template\processor(__DIR__."/templates/$org", 
+      [
+        'frontparser'=>$parser,
+        'layout' => 'layout'
+    ]);
+
+      $api = new email($mailer, $processor);
+
+      dbg("send", $org, $project, $data);
+      resp($api->send($template, $data, $hdrs));
+  });
+
 });
 
+$router->before('POST', '/send/(\w+)/.*', function($org) use ($router, $conf, $data) {
 
-$router->before('GET|POST', '/manage/.*', function() use ($router, $conf, $data) {
-
-  dbg("before manage");
+  dbg("before send");
 
   $hdrs = $router->getRequestHeaders();
+  dbg("headers:", $hdrs, $_SERVER);
 
-  if(!$hdrs['x-any-admin'] || ($hdrs['x-any-admin']!=$_SERVER["XSTORE_ADMIN"])){
+  if(!check_api($hdrs, $_SERVER, org_options_read($conf['conf']['etc'], $org))){
+
     dbg("+++ 401 +++ ");
 
-   # header("HTTP/1.1 401 Unauthorized");
-   # resp(['res'=>'fail', 'msg'=>'Unauthorized']);
+    header("HTTP/1.1 401 Unauthorized");
+    resp(['res'=>'fail', 'msg'=>'Unauthorized Api Request']);
 
-   # exit;
+    exit;
   }
 });
 
@@ -107,7 +130,41 @@ $router->mount('/manage', function() use ($router, $conf, $data) {
 
 });
 
-dbg("+++ setup  +++ ");
+$router->before('GET|POST', '/admin/.*', function() use ($router, $conf, $data) {
+
+  dbg("before admin");
+
+  $hdrs = $router->getRequestHeaders();
+  dbg("headers:", $hdrs, $_SERVER);
+
+  if(!check_admin($hdrs, $_SERVER)){
+
+    dbg("+++ 401 +++ ");
+
+    header("HTTP/1.1 401 Unauthorized");
+    resp(['res'=>'fail', 'msg'=>'Unauthorized']);
+
+    exit;
+  }
+});
+
+$router->mount('/admin', function() use ($router, $conf, $data) {
+  
+  dbg("+++ admin +++ ");
+  dbg($conf);
+
+  $api = new orgs($conf['conf']);
+  
+  $router->get('/(\w+)', function($meth) use ($api){
+    $meth = 'get_'.$meth;
+    resp($api->$meth());
+  });
+
+  $router->post('/(\w+)/(\w+)', function($meth, $name) use ($api, $data){
+    $meth = 'post_'.$meth;
+    resp($api->$meth($name, $data));
+  });
+});
 
 $router->set404(function() {
     header('HTTP/1.1 404 Not Found');

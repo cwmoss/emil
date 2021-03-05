@@ -1,4 +1,5 @@
-templates
+templates/
+etc/
 emil.ini
 vendor/
 logs/
@@ -7,4 +8,5 @@ composer.lock
 node_modules/
 .quasar/
 .env
+.netrc
 .DS_Store

@@ -24,8 +24,9 @@ class email{
         
         try{
             $this->mailer->send($views, $data);
-        }catch(throwable $e){
-            return ['err'=>$e->getTraceAsString()];
+        }catch(\throwable $e){
+            
+            return ['err'=>get_trace_from_exception($e)];
         }
         
         

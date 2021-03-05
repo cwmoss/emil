@@ -1,4 +1,14 @@
 {
+    "autoload": {
+        "psr-4": {
+            "twentyseconds\\": "src/twentyseconds",
+            "api\\":"src/api"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "@setup",
+        "setup": "@php setup/install.php"
+    },
     "require": {
         "bramus/router": "^1.4",
         "guzzlehttp/guzzle": "^7.0",

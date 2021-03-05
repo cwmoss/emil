@@ -102,3 +102,57 @@ function stream_to_file($name){
     'size' => filesize($tmpfname)
   ];
 }
+
+function get_trace_from_exception($e){
+    $class = get_class($e);
+    $pclass = get_parent_class($e);
+    $m=$e->getMessage();
+
+    $fm = sprintf("%s:\n   %s line: %s code: %s\n   via %s%s\n", $m, $e->getFile(), $e->getLine(),
+        $e->getCode(), $class, $pclass?', '.$pclass:''
+    );
+    $trace .= $fm.$e->getTraceAsString();
+    return $trace;
+}
+
+function check_admin($hdrs, $server){
+  return check_auth(['admin', 'X-Emil-Admin', 'EMIL_ADMIN_KEY'], $hdrs, $server);
+}
+
+function check_api($hdrs, $server, $etc_org){
+  $server['ORG_PWD'] = $etc_org['api_key'];
+  return check_auth(['api', 'X-Emil-Api', 'ORG_PWD'], $hdrs, $server);
+}
+
+function check_auth($key_names, $hdrs, $server){
+  list($basicuser, $xheader, $envsecret) = $key_names;
+  if(!$server[$envsecret]) return false;
+
+  // first check for auth xheader
+  // then for basic-auth header basicuser
+  if(isset($hdrs[$xheader])){
+    return ($server[$envsecret]===$hdrs[$xheader]);
+  }else{
+  // php has a shortcut here
+  // _SERVER:  PHP_AUTH_USER":"robert","PHP_AUTH_PW":"seeeeecret"
+    return ($server['PHP_AUTH_USER']===$basicuser && $server['PHP_AUTH_PW'] === $server[$envsecret]);
+  }
+  return false;
+}
+
+function org_options_read($base, $name){
+  $cont = file_get_contents("{$base}/{$name}.json");
+  if(!$cont) return [];
+  $data = json_decode($cont, true);
+  return $data?:[];
+}
+
+function org_options_save($base, $name, $data){
+  return file_put_contents("{$base}/{$name}.json", json_encode($data));
+}
+
+function org_options_update($base, $name, $data){
+  return org_options_save($base, $name, array_merge(
+    org_options_read($base, $name), $data
+  ));
+}
