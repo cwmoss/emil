@@ -46,6 +46,10 @@ function url_to_pdo_dsn($url){
 }
 
 function gen_secret(){
+    return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '='); 
+}
+
+function gen_secret_hex(){
   return bin2hex(random_bytes(32));
 }
 
