@@ -1,21 +1,50 @@
 <?php
 namespace api;
 
-use twentyseconds\template\processor;
+use function emil\template\{process, process_string, get_data};
+
 
 class email{
     
     public $mailer;
     public $processor;
+    public $frontparser;
+    public $base;
     
-    function __construct($mailer, $processor){
+    function __construct(\emil\mailer $mailer, $frontparser, $base){
         $this->mailer = $mailer;
-        $this->processor = $processor;
+        $this->frontparser = $frontparser;
+        $this->base = $base;
     }
 
 // xorc\mailer::send('register', ['to'=>$this->registration->email], ['u'=>$this->registration]);
 
-    function send($template, $data, $hdrs){
+    function send($template, $data){
+        [$views, $data] = process($template, $data, [
+            'base'=> $this->base,
+            'frontparser' => $this->frontparser,
+            'types' => ['txt', 'html']
+            ]);
+        
+        $data['subject'] = process_string($data['subject'], $data);
+        dbg("++ data", $data);
+
+        try{
+            $this->mailer->send([
+                'txt' => $views[0]['res'],
+                'html' => $views[1]['res'],
+                'embeds' => $views[1]['embeds']
+                ], $data);
+                
+        }catch(\throwable $e){
+            
+            return ['err'=>get_trace_from_exception($e)];
+        }
+        
+        return ['res'=>'ok sent'];
+    }
+    
+    function sendx($template, $data, $hdrs){
         dbg("++ send data", $data);
         
         $views = $this->processor->process($template, $data);
@@ -35,12 +64,4 @@ class email{
         return ['res'=>'ok sent'];
     }
     
-    function sendx($type, $doc, $hdrs){
-        $doc['_type'] = $type;
-        $id = $this->store->insert_doc($doc);
-        if($id){
-            $this->store->log($id, $_SERVER['REMOTE_ADDR'], $hdrs);
-        }
-        return ['res'=>'ok'];
-    }
 }

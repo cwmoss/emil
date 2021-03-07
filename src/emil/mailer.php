@@ -1,5 +1,5 @@
 <?php
-namespace twentyseconds;
+namespace emil;
 
 class mailer{
 

@@ -1,8 +1,9 @@
 <?php
 # phpinfo();
-$conf = require_once(__DIR__."/../src/boot.php");
+$base = __DIR__."/../";
+$app = require_once($base."src/boot.php");
 
-var_dump($conf);
+#var_dump($conf);
 
 dbg("+++ start +++ ");
 
@@ -14,6 +15,6 @@ if(preg_match("/index\.php/", $_SERVER['REQUEST_URI'])){
 	$BASE_URL=$_SERVER['SCRIPT_NAME'].'/';
 }
 
-require_once(__DIR__."/../http.php");
+require_once($base."src/routing.php");
 
 

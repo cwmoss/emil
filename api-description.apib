@@ -1,0 +1,37 @@
+FORMAT: 1A
+
+# Emil
+
+Emil is a API for sending transactional, template based E-Mails. 
+
+## GET /
++ Response 200 (application/json)
+
+        {"ok": "hello my name is emil"}
+
+# Group Admin
+
+Admin for Organizations.
+
+## Organizations [/admin/orgs]
+
+### List All Organizations [GET]
++ Response 200 (application/json)
+
+## Organization [/admin/org/{org}]
++ Parameters
+    + org: testacme (required, string) - Name of the Organzization
+
+### Create a Organizations [POST]
++ Response 200 (application/json)
+        
+### Show Info [GET]
++ Response 200 (application/json)
+
+
+
+### Delete a Organizations [DELETE]    
++ Response 200
+
+
+

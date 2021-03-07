@@ -1,6 +1,13 @@
 <?php
-namespace twentyseconds\template;
+namespace emil\template;
 
+/*
+    $processor = new twentyseconds\template\processor(__DIR__."/templates/$org/$project", 
+      [
+        'frontparser'=>$parser,
+        'layout' => 'layout'
+    ]);
+*/
 
 use LightnCandy\LightnCandy;
 
