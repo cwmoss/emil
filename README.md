@@ -20,17 +20,16 @@ this service supports multiple tenants `orgs`. tenants can have multiple `projec
 
     # endpoint of service: http://acme.com/emil
     # org: acme
-    # project: niceproject
     # template: welcome
     # POST email/{org}/{project}/send/{template}
-    curl http://localhost:1199/send/acme/niceproject/welcome \
+    curl http://localhost:1199/send/acme/welcome \
       -H "X-Emil-Api: 9ecc433c..."
       -d '{"name":"strange guy","to":"latoya@myspace.com","confirm_token":"mM-Juhu99-EEnlf"}'
 
-    # without project and with basic auth -u api:organization-api-key
+    # with basic auth -u api:organization-api-key
 	 curl -v http://localhost:1199/send/acme/welcome \
 	   -u api:9ecc433c... \
-	   -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}' -H "X-Emil-Api: 9ecc433c..."
+	   -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}'
 
 ## quick start
 
@@ -59,6 +58,7 @@ all email sending `/send` or management `/manage` api actions must be authorized
 
 ## API
 
+komplete API Doks are here: [API Blueprint](api-description.apib)
 
 ### Send Message
 
@@ -67,17 +67,17 @@ all email sending `/send` or management `/manage` api actions must be authorized
 
 Upload (multiple) Templates
 
-`POST /manage/ORG/PROJECT`
+`POST /manage/ORG/`
 
-	curl http://localhost:1199/manage/ORG/PROJECT/upload \
+	curl http://localhost:1199/manage/ORG/upload \
 		-F "u[]=@welcome.html" -F "u[]=@welcome.txt" \
 		-F "u[]=@logo.png" -F "u[]=@__default.html"
 
 Upload single Template
 
-`PUT /manage/ORG/PROJECT/TEMPLATENAME.HTML`
+`PUT /manage/ORG/TEMPLATENAME.HTML`
 
-	curl http://localhost:1199/manage/ORG/PROJECT/upload/logo.png -T logo.png
+	curl http://localhost:1199/manage/ORG/upload/logo.png -T logo.png
 
 
 ### Admin
@@ -90,7 +90,7 @@ Create Organization
 
 all the examples are refering to this setup, since this is the easiest way for development
 
-	 php -S localhost:1199 -t public/
+	 php -S localhost:1199 -t public/ public/index.php
 
 	 # your endpoint
 	 http://localhost:1199
