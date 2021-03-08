@@ -13,6 +13,7 @@ if($BASE_URL){
 
 dbg("+++ incoming +++ ", $_SERVER['REQUEST_METHOD'], $router->getCurrentUri());
 dbg("+++ server vars", $_SERVER);
+dbg("+++ conf", $app->get("conf"));
 
 $router->get('/', function()use($req){
     dbg("index");

@@ -12,6 +12,8 @@ function get_config(){
     $conf['base'] = $appbase."/templates";
     $conf['etc'] = $appbase."/etc";
     $conf['appbase'] = $appbase;
+
+    $conf['transport'] = $_SERVER['EMIL_MAIL_TRANSPORT'];
     return $conf;
 }
 return [
