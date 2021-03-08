@@ -20,7 +20,7 @@ this service supports multiple tenants `orgs`.
 
 ## example request
 
-    # endpoint of service: http://acme.com/emil
+    # endpoint of service: http://localhost:1199
     # org: acme
     # template: welcome
     # POST send/{org}/{template}
