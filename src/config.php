@@ -31,7 +31,7 @@ return [
     'frontparser' => create('Mni\FrontYAML\Parser'),
     api\email::class => create()
         ->constructor(
-            get(twentyseconds\mailer::class),
+            get(emil\mailer::class),
             get('frontparser')
         ),
     api\templates::class => create()
