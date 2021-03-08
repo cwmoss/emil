@@ -40,7 +40,9 @@ $builder->useAnnotations(false);
 $builder->addDefinitions(__DIR__.'/config.php');
 $app = $builder->build();
 
-Dotenv\Dotenv::createImmutable($app->get("appbase"))->load();
+// in production we will not have a .env file
+if(file_exists($app->get("appbase").'.env'))
+	Dotenv\Dotenv::createImmutable($app->get("appbase"))->load();
 
 
 function api_exception_handler($e){
