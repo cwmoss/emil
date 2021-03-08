@@ -8,20 +8,22 @@ self hosted email service
 
 most of my apps require sending emails. while migrating to the cloud stack, i felt the need to have an email service via http that works the same way as my old in-app functions. i wanted to be able to host this service by myself. most of time i don't need most of the functionality of the big boys' services. so i don't want to subscribe to any service just to be able to send a bunch of mails a month. what i needed was templating. having a single layout for all html emails of one project. 
 
+the api should be easy to consume with `curl`.
+
 you will need a SMTP account for sending.
 
 you will have to create templates.
 
 you can't send a raw email here. everything is based on prepared templates.
 
-this service supports multiple tenants `orgs`. tenants can have multiple `projects`.
+this service supports multiple tenants `orgs`.
 
 ## example request
 
     # endpoint of service: http://acme.com/emil
     # org: acme
     # template: welcome
-    # POST email/{org}/{project}/send/{template}
+    # POST send/{org}/{template}
     curl http://localhost:1199/send/acme/welcome \
       -H "X-Emil-Api: 9ecc433c..."
       -d '{"name":"strange guy","to":"latoya@myspace.com","confirm_token":"mM-Juhu99-EEnlf"}'
@@ -29,7 +31,7 @@ this service supports multiple tenants `orgs`. tenants can have multiple `projec
     # with basic auth -u api:organization-api-key
 	 curl -v http://localhost:1199/send/acme/welcome \
 	   -u api:9ecc433c... \
-	   -d '{"name":"strange guy","to":"rw@20sec.net","from":"rw@20sec.net"}'
+	   -d '{"name":"strange guy","to":"latoya@myspace.com","from":"acme@example.org"}'
 
 ## quick start
 
