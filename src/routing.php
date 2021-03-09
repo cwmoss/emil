@@ -150,6 +150,14 @@ $router->before('GET|POST|DELETE', '/admin/.*', function() use ($router, $conf, 
   }
 });
 
+$router->get("/ui", function() use($app){
+    $secure = false;
+    $domain = "";
+    $path = "/";
+    setcookie('signedCookie','uneditable value here', 0, $path, $domain, $secure, true);
+    $uibase = $app->get("appbase").'/ui';
+    readfile($uibase.'/index.html');
+});
 $router->set404(function() {
     header('HTTP/1.1 404 Not Found');
     resp(['res'=>'fail', 'msg'=>'not found']);
