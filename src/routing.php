@@ -1,9 +1,4 @@
 <?php
-use api\email;
-use api\templates;
-use api\orgs;
-
-
 require_once(__DIR__."/dispatcher.php");
 
 error_reporting(E_ALL & ~E_NOTICE);
