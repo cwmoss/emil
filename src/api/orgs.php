@@ -20,14 +20,19 @@ class orgs{
 	    return (new org($org, $base))->info();
 	}
 	
-	public function post_create($name, $data=[]){
+	public function post_create($name, $data=null){
 		// $p = gen_password();
 		// dbg("pass $p");
+		if(!$data) $data = [];
+		
 		$org = [
 			'name' => $name,
 		//	'password' => password_hash($p, PASSWORD_DEFAULT),
 			'api_key' => gen_secret()
 		];
+		$data_ok = array_blocklist($data, 'api_key password name');
+		$org = array_merge($org, $data_ok);
+
 		$orgdir = $this->conf['base'].'/'.$name;
 		
 		mkdir($orgdir);

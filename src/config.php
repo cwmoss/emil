@@ -5,21 +5,31 @@ use function DI\factory;
 use function DI\create;
 use function DI\get;
 
-function get_config(){
+function get_env(){
+    return array_merge($_SERVER, getenv());
+}
+
+function get_config($env){
     $appbase = realpath(__DIR__."/../");
-    $conf = parse_ini_file($appbase."/emil.ini");
-    
+    // $conf = parse_ini_file($appbase."/emil.ini");
+    $conf = [];
+
     $conf['base'] = $appbase."/templates";
     $conf['etc'] = $appbase."/etc";
     $conf['appbase'] = $appbase;
 
-    $conf['transport'] = $_SERVER['EMIL_MAIL_TRANSPORT'];
+    $conf['transport'] = $env['EMIL_MAIL_TRANSPORT'];
+
     return $conf;
 }
+
 return [
-    'conf' => function(){
+    'env' =>function(){
+        return get_env();
+    },
+    'conf' => function(ContainerInterface $c){
         dbg("+++ config load");
-        return get_config();
+        return get_config($c->get('env'));
     },
     'appbase' => function (ContainerInterface $c) {
         return $c->get('conf')['appbase'];
