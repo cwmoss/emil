@@ -1,8 +1,8 @@
 # emil
 
-microservice for transactional email
+self hosted microservice for transactional, templated based email
 
-self hosted email service
+WIP - this is work in progress!
 
 ## goals
 
