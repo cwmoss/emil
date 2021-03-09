@@ -7,6 +7,18 @@ function resp($data){
   dbg("+++ finished");
 }
 
+function e404($msg='not found'){
+  header('HTTP/1.1 404 Not Found');
+  resp(['fail'=>$msg]);
+}
+
+function e401($msg='unauthorized api request'){
+  dbg("+++ 401 +++ ");
+  header("HTTP/1.1 401 Unauthorized");
+  resp(['fail'=>$msg]);
+  exit;
+}
+
 function dbg($txt, ...$vars){
 // im servermodus wird der zeitstempel automatisch gesetzt
 //	$log = [date('Y-m-d H:i:s')];
@@ -68,6 +80,10 @@ function gen_password($len=15){
 /*
 password_verify ( string $password , string $hash )
 */
+function array_blocklist($arr, $block){
+    if(is_string($block)) $block = explode(" ", $block);
+    return array_diff_key($arr, array_flip($block));
+}
 
 function normalize_files_array($files = []) {
 
@@ -120,6 +136,7 @@ function get_trace_from_exception($e){
 }
 
 function check_admin($hdrs, $server){
+  #dbg("+++ check admin ", $server);
   return check_auth(['admin', 'X-Emil-Admin', 'EMIL_ADMIN_KEY'], $hdrs, $server);
 }
 

@@ -1,7 +1,5 @@
 <?php
-use api\email;
-use api\templates;
-use api\orgs;
+require_once(__DIR__."/dispatcher.php");
 
 error_reporting(E_ALL & ~E_NOTICE);
 
@@ -11,12 +9,14 @@ if($BASE_URL){
    $router->setBasePath($BASE_URL);
 }
 
+dispatcher::$app = $app;
+
 dbg("+++ incoming +++ ", $_SERVER['REQUEST_METHOD'], $router->getCurrentUri());
-dbg("+++ server vars", $_SERVER);
+dbg("+++ server vars/ env", $_SERVER, getenv());
 dbg("+++ conf", $app->get("conf"));
 
 $router->get('/', function()use($req){
-    dbg("index");
+  dbg("index");
 	resp(['ok'=>'hello my name is emil']);
 });
 
@@ -37,116 +37,53 @@ $router->mount('/send', function() use ($router, $app) {
         resp($api->send($template, $data));
   });
 
-
 });
 
 $router->before('POST', '/send/(\w+)/.*', function($org) use ($router, $app) {
 
-  dbg("before send", $org);
+  dbg("AUTH send", $org);
 
   $hdrs = $router->getRequestHeaders();
-
-  if(!check_api($hdrs, $_SERVER, org_options_read($app->get("etc"), $org))){
-
-    dbg("+++ 401 +++ ");
-
-    header("HTTP/1.1 401 Unauthorized");
-    resp(['res'=>'fail', 'msg'=>'Unauthorized Api Request']);
-
-    exit;
+  if(!check_api($hdrs, $app->get("env"), org_options_read($app->get("etc"), $org))){
+    e401();
   }
 });
 
 $router->before('POST|GET|PUT|DELETE', '/manage/(\w+)(/.*)?', function($org) use ($router, $app) {
 
-  dbg("before manage", $org);
+  dbg("AUTH manage", $org);
 
   $hdrs = $router->getRequestHeaders();
-
-  dbg("+++ hdrs", $hdrs);
-  
-  if(!check_api($hdrs, $_SERVER, org_options_read($app->get("etc"), $org))){
-
-    dbg("+++ 401 +++ ");
-
-    header("HTTP/1.1 401 Unauthorized");
-    resp(['res'=>'fail', 'msg'=>'Unauthorized Api Request']);
-
-    exit;
+  if(!check_api($hdrs, $app->get("env"), org_options_read($app->get("etc"), $org))){
+    e401();
   }
 });
 
-$router->mount('/manage', function() use ($router, $app) {
+$router->mount('/manage', function() use ($router) {
 
-  $router->get('/(\w+)', function($org) use($app) {
-     // $api = new templates($conf['conf']);
-      $api = $app->get(api\templates::class);
-      resp($api->get_projects($org));
-  });
-
-  $router->put('/(\w+)/upload/([\w.]+)', function($org, $name) use($app) {
-      $api = $app->get(templates::class);
-    dbg("PUT", $name, 'xxx', $_FILES);
-    resp($api->upload_stream($org, $name));
-
-    #  resp($api->upload_stream($org, $project, $name));
-  });
-
-  $router->post('/(\w+)/upload', function($org) use($app) {
-      $api = $app->get(templates::class);
-      resp($api->upload($org));
-  });
-  
-  $router->delete('/(\w+)/([\w.]+)', function($org, $name) use($app) {
-      $api = $app->get(templates::class);
-      resp($api->delete($org, $name));
-  });
+  $router->get('/(\w+)', "dispatcher::templates__get_projects");
+  $router->put('/(\w+)/upload/([\w.]+)', "dispatcher::templates__upload_stream");
+  $router->post('/(\w+)/upload', "dispatcher::templates__upload");
+  $router->delete('/(\w+)/([\w.]+)', "dispatcher::templates__delete");
   
 });
 
-
-$router->mount('/admin', function() use ($router, $app) {
+$router->mount('/admin', function() use ($router) {
  
-  $router->get('/orgs', function() use ($app){
-    $api = $app->get(orgs::class);
-    $meth = 'get_'.$meth;
-    resp($api->get_orgs());
-  });
-
-  $router->get('/org/(\w+)', function($name) use ($app){
-      $api = $app->get(orgs::class);
-      $meth = 'get_'.$meth;
-      resp($api->get_org($name));
-    });
-    
-  $router->post('/org/(\w+)', function($name) use ($app){
-    $api = $app->get(orgs::class);
-    $meth = 'post_'.$meth;
-    resp($api->post_create($name, get_json_req()));
-  });
-  
-  $router->delete('/org/(\w+)', function($name) use ($app){
-      $api = $app->get(orgs::class);
-      resp($api->delete($name));
-    });
-  
+  $router->get('/orgs', "dispatcher::orgs__get_orgs");
+  $router->get('/org/(\w+)', "dispatcher::orgs__get_org");
+  $router->post('/org/(\w+)', "dispatcher::orgs__post_create");
+  $router->delete('/org/(\w+)', "dispatcher::orgs__delete");
+ 
 });
 
-$router->before('GET|POST|DELETE', '/admin/.*', function() use ($router, $conf, $data) {
+$router->before('GET|POST|DELETE', '/admin/.*', function() use ($router, $app, $data) {
 
-  dbg("before admin");
+  dbg("AUTH admin");
 
   $hdrs = $router->getRequestHeaders();
-  dbg("headers:", $hdrs, $_SERVER);
-
-  if(!check_admin($hdrs, $_SERVER)){
-
-    dbg("+++ 401 +++ ");
-
-    header("HTTP/1.1 401 Unauthorized");
-    resp(['res'=>'fail', 'msg'=>'Unauthorized']);
-
-    exit;
+  if(!check_admin($hdrs, $app->get("env"))){
+    e401();
   }
 });
 
@@ -159,8 +96,7 @@ $router->get("/ui", function() use($app){
     readfile($uibase.'/index.html');
 });
 $router->set404(function() {
-    header('HTTP/1.1 404 Not Found');
-    resp(['res'=>'fail', 'msg'=>'not found']);
+  e404();
 });
 
 $router->run();
