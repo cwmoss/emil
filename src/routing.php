@@ -12,7 +12,8 @@ if($BASE_URL){
 dispatcher::$app = $app;
 
 dbg("+++ incoming +++ ", $_SERVER['REQUEST_METHOD'], $router->getCurrentUri());
-dbg("+++ server vars/ env", $_SERVER, getenv());
+#dbg("+++ server vars/ env", $_SERVER, getenv());
+dbg("+++ cookie", $_COOKIE['emil']);
 dbg("+++ conf", $app->get("conf"));
 
 $router->get('/', function()use($req){
@@ -91,11 +92,16 @@ $router->get("/ui", function() use($app){
     $secure = false;
     $domain = "";
     $path = "/";
-    setcookie('signedCookie','uneditable value here', 0, $path, $domain, $secure, true);
+    setcookie('emil','admintime', 0, $path, $domain, $secure, true);
     $uibase = $app->get("appbase").'/ui';
     readfile($uibase.'/index.html');
 });
+$router->get("/ui/([-\w.]+)", function($file) use($app){
+    $uibase = $app->get("appbase").'/ui';
+    readfile($uibase.'/'.$file);
+});
 $router->set404(function() {
+    dbg("-- 404");
   e404();
 });
 
