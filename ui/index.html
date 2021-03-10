@@ -40,6 +40,12 @@
     </div>
 
     <div v-else class="login">
+
+       <transition name="bounce">
+          <div v-if="loginerr" class="error"><img src="ui/hate.gif">
+          </div>
+       </transition>
+       
       <form v-on:submit.prevent>
         <div class="felement">
           <label for="username">Username</label><br>
@@ -59,6 +65,7 @@
           </div>
         </div>
       </form>
+            
     </div>
 
 
@@ -90,6 +97,7 @@ const edapp = new Vue({
       login: false,
       user: null,
       password: null,
+      loginerr: false,
       
       orgs: [],
       org: null,
@@ -113,7 +121,11 @@ const edapp = new Vue({
    do_login: function(){
       this.fetch('/login', {}).then(data => {
          console.log("data...", data)
-         this.login=true
+         //this.login=true
+         this.loginerr=true
+         setTimeout(() => {
+           this.loginerr = false
+         }, 2000)
        })
    },
     save_content: function(){
