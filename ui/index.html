@@ -2,8 +2,9 @@
 <html>
 <head>
   <title>emil admin</title>
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
-  <link rel='stylesheet' href='js/nprogress.css'/>
+  <link rel="shortcut icon" type="image/x-icon" href="ui/favicon.png">
+  <link rel='stylesheet' href='ui/nprogress.css'/>
+  <link rel='stylesheet' href='ui/app.css'/>
 
 <style>
   [v-cloak] {
@@ -17,175 +18,49 @@
 
 <style>
 
-  html,body{
-     margin:0;
-     padding:0;
-     font: normal normal 400 1em/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  }
-  body{
-/*     background: url(ui/mesh.png) no-repeat center center fixed;*/
-     background: url(ui/amoled-leaf-wallpapers.jpg) no-repeat center center fixed;
-    
-     background-size: cover;
-  }
-  h1{
-     background-color:white;
-     padding:16px;
-     display: inline-block;
-  }
-  li{
-    list-style-type: none;
-    margin-bottom: 3px;
-  }
-  a{
-    text-decoration: none;
-    color: black;
-    padding: 3px 6px;
-  }
 
-  a.active{
-    color: white;
-    background: black;
-  }
-  .item{
-    position: relative;
-
-  }
-  .item .props{
-    position: absolute;
-    top: 0; left:0;
-    background: white;
-    padding: 3px;
-    display: none;
-  }
-  .item .number{
-    color: #999;
-  }
-  .item:hover .props{
-    display: block;
-  }
-  .item img{
-    pointer-events: none;
-  }
-  .dbl-toggle{
-    color: #aaa;
-  }
-  .dbl .dbl-toggle, .invisible .visible-toggle{
-    color: #000;
-  }
-  .visible-toggle:after{
-    content: "-";
-  }
-  .invisible .visible-toggle:after{
-    content: "+";
-  }
-  .item.invisible{
-    height: 35px;
-    margin-bottom: 4px;
-    overflow: hidden;
-    opacity:0.2;
-  }
-  .dbl + div .props em{
-   
-    color: #f0f0f0;
-  }
-  .props em{
-    cursor: pointer;
-    font-style:normal;
-  }
-  button{
-    border: 2px solid black;
-    background-color: white;
-    padding: 4px;
-    font-size: 14px;
-  }
-#tree{
-   float:left;
-   width:20%;
-}
-#content{
-   float:right;
-   width:80%;
-}
-.dbl{
-  float:left;
-  margin-right:6px;
-}
-.dbl + div{
-  margin-left: 126px;
-}
-#content-edit{
-  display:flex;
-}
-#images{
-  width: 20%;
-}
-#meta{
-  width: 80%;
-}
-.v--modal{
-  padding:16px !important;
-  height: 80%;
-}
-.v--modal h2{
-  margin-top: 0;
-}
-label{
-  width:14%;
-  display: inline-block;
-}
-.startscreen{
-
-}
-.startscreen p{
-  margin-top: 200px;
-  text-align: left;
-}
-p.gray{
-  color: #aaa;
-
-}
-#splash[v-cloak]{
-   padding:100px;
-   display:block;
-   width:100%;
-   height:100%
-   margin-top:30%;
-   background:#000;
-   color: white;
-   text-align:center;
-}
-#splash *{
-   margin-top:0;
-   margin-bottom:400px;
-}
-#splash h1{
-   font-size:64px;
-}
-#splash p{
-   font-size: 36px;
-}
-#splash{
-   display:none;
-}
-input, option, select{
-  font-size:16px;
-  padding:4px;
-}
-#editor{
-  width:100%;
-  margin-bottom: 24px;
-  padding:8px;
-}
-textarea{
-  height: 300px;
-  width:70%;
-}
 </style>
 </head>
 <body>
+
   <div id="admin-app">
-     <h1>hello admin</h1>
+
+     <h1>emil</h1>
+
+     <div v-if="login" class="content">
+       <div id="orgs">
+        <ul>
+          <li v-for="item in orgs"><a v-on:click="select_org(item)" href="javascript:;" v-bind:class="{active:(org && org.name==item)}"  v-html="item"></a>
+        </ul>
+       </div>
+
+       <div id="org">
+        {{org}}
+       </div>
+    </div>
+
+    <div v-else class="login">
+      <form>
+        <div class="felement">
+          <label for="username">Username</label><br>
+          <div class="inp">
+            <input type="text" id="username">
+          </div>
+        </div>
+        <div class="felement">
+          <label>Password</label><br>
+          <div class="inp">
+            <input type="text" id="Password">
+          </div>
+        </div>
+        <div class="felement btn">
+          <div class="inp">
+            <button type="button">Login</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
   </div>
 
 
@@ -193,9 +68,11 @@ textarea{
 
 
 <script src="ui/vue.js"></script>
+<script src="ui/nprogress.js"></script>
 
 <script>
- 
+
+NProgress.configure({ parent: 'body' }); 
 
 const edapp = new Vue({
   components: {
@@ -209,16 +86,27 @@ const edapp = new Vue({
       active: null,
       base: 'blog/',
       story: null,
+      
+      login: false,
+
+      orgs: [],
+      org: null,
+
       index: [], 
       cstory:{slug:'', title:''},
       estory:{}
     };
   },
   methods: {
-    select_story: function (item) {
+    select_org: function (item) {
       console.log(item);
-      this.active = item.id;
-      this.story = item;
+      NProgress.start()
+      this.active = item;
+      // this.org = item;
+      this.fetch("/admin/org/"+item).then(data => {
+        this.org = data
+      })
+
     },
    
     save_content: function(){
@@ -228,22 +116,36 @@ const edapp = new Vue({
           if(resp.data) that.story = resp.data;
         });
     },
-    fetch: function(url){
-       fetch(url)
-       .then(response => {
-          console.log("status... ", response.status)
-          if(response.status==401) return Promise.reject(response);
-          response.json()
-          })
-       .then(data => console.log("data...", data))
-       .catch(error => console.error("err...", error));
+    fetch: async function(url, opts){
+      NProgress.start()
+       var res = await fetch(url, opts||{}).finally(function(){
+        NProgress.done()
+       })
+
+       if(res.status==401){
+          this.login = true
+          return {err: 'auth'}
+       }
+       if(!res.ok){
+          console.error("err...", res);
+          return {err: 'fail'}
+          // return Promise.reject(res);
+       }
+       
+
+       console.log("++ resp", res)
+       return await res.json()
     }
   },
   mounted: function(){
     console.log("mounting");
     var vm = this;
     vm.index = window.__INIT_DATA__;
-    this.fetch('/admin/orgs')
+    this.fetch('/admin/orgs').then(data => {
+      console.log("data...", data)
+      this.orgs = data.orgs
+    })
+    
       
     
     /*

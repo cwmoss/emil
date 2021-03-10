@@ -1,4 +1,6 @@
 <?php
+use Ahc\Jwt\JWT;
+use Ahc\Jwt\JWTException;
 
 function resp($data){
   header("Content-Type: application/json"); #; charset=utf-8
@@ -57,12 +59,12 @@ function url_to_pdo_dsn($url){
     ];
 }
 
-function gen_secret(){
-    return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '='); 
+function gen_secret($bytes=32){
+    return rtrim(strtr(base64_encode(random_bytes($bytes)), '+/', '-_'), '='); 
 }
 
-function gen_secret_hex(){
-  return bin2hex(random_bytes(32));
+function gen_secret_hex($bytes=32){
+  return bin2hex(random_bytes($bytes));
 }
 
 function gen_password($len=15){
@@ -77,6 +79,28 @@ function gen_password($len=15){
 
   return $str;
 }
+
+function gen_jwt_secret(){
+  return gen_secret(64);
+}
+
+function gen_jwt($secret, $org){
+  $token   = (new JWT($secret, 'HS256', 1800))->encode(['org' => $org, 'scopes' => ['user']]);
+  return $token;
+}
+
+function check_jwt($secret, $token){
+  // TODO: let it crash
+  if(!$secret || !$token) return false;
+
+  try{
+    $payload = (new JWT($secret, 'HS256', 1800))->decode($token);
+  }catch(JWTException $e){
+    $payload = false;
+  }
+  return $payload;
+}
+
 /*
 password_verify ( string $password , string $hash )
 */

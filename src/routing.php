@@ -82,9 +82,14 @@ $router->before('GET|POST|DELETE', '/admin/.*', function() use ($router, $app, $
 
   dbg("AUTH admin");
 
+#e401();
+
   $hdrs = $router->getRequestHeaders();
   if(!check_admin($hdrs, $app->get("env"))){
-    e401();
+    $token = check_jwt($app->get("conf")['jwt_secret'], $_COOKIE['emil']);
+    if(!$token || $token['org']!=='admin'){
+      e401();
+    }
   }
 });
 
@@ -92,11 +97,22 @@ $router->get("/ui", function() use($app){
     $secure = false;
     $domain = "";
     $path = "/";
-    setcookie('emil','admintime', 0, $path, $domain, $secure, true);
+    $cookieopts = ['expires'=>0, 'path'=>$path, 'domain'=>$domain, 'secure'=>$secure, 'httponly'=>true, 'samesite'=>'Strict'];
+    dbg("== conf++", $app->get("conf"));
+    $jwt_in = $_COOKIE['emil'];
+    $jwt = check_jwt($app->get("conf")['jwt_secret'], $jwt_in);
+    dbg("== jwt", $jwt);
+    setcookie('emil', gen_jwt($app->get("conf")['jwt_secret'], 'admin'), $cookieopts);
     $uibase = $app->get("appbase").'/ui';
     readfile($uibase.'/index.html');
 });
 $router->get("/ui/([-\w.]+)", function($file) use($app){
+    dbg("++ jwt cookie", $_COOKIE['emil']);
+    if(preg_match('/css$/', $file)){
+      header("Content-Type: text/css");
+    }elseif(preg_match('/js$/', $file)){
+      header("Content-Type: text/javascript");
+    }
     $uibase = $app->get("appbase").'/ui';
     readfile($uibase.'/'.$file);
 });

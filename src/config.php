@@ -19,7 +19,7 @@ function get_config($env){
     $conf['appbase'] = $appbase;
 
     $conf['transport'] = $env['EMIL_MAIL_TRANSPORT'];
-
+    $conf['jwt_secret'] = $env['EMIL_JWT_SECRET'];
     return $conf;
 }
 
