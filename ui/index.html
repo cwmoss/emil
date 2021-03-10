@@ -40,28 +40,28 @@
     </div>
 
     <div v-else class="login">
-      <form>
+      <form v-on:submit.prevent>
         <div class="felement">
           <label for="username">Username</label><br>
           <div class="inp">
-            <input type="text" id="username">
+            <input required v-model="user" type="text" id="username" name="username">
           </div>
         </div>
         <div class="felement">
           <label>Password</label><br>
           <div class="inp">
-            <input type="text" id="Password">
+            <input required v-model="password" type="password" id="password" name="password">
           </div>
         </div>
         <div class="felement btn">
           <div class="inp">
-            <button type="button">Login</button>
+            <button type="submit" @click="do_login">Login</button>
           </div>
         </div>
       </form>
     </div>
 
-  </div>
+
 
 
 </div>
@@ -88,7 +88,9 @@ const edapp = new Vue({
       story: null,
       
       login: false,
-
+      user: null,
+      password: null,
+      
       orgs: [],
       org: null,
 
@@ -108,7 +110,12 @@ const edapp = new Vue({
       })
 
     },
-   
+   do_login: function(){
+      this.fetch('/login', {}).then(data => {
+         console.log("data...", data)
+         this.login=true
+       })
+   },
     save_content: function(){
       var that = this;
       $axios.post('/story-save-content', {id: that.story.id, content: that.story.o_content})
@@ -116,9 +123,14 @@ const edapp = new Vue({
           if(resp.data) that.story = resp.data;
         });
     },
-    fetch: async function(url, opts){
+    fetch: async function(url, data){
+       var opts = {}
+       if(data){
+          opts.body = JSON.stringify(data)
+          opts.method = 'POST'
+      }
       NProgress.start()
-       var res = await fetch(url, opts||{}).finally(function(){
+       var res = await fetch(url, opts).finally(function(){
         NProgress.done()
        })
 

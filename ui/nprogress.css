@@ -1,10 +1,14 @@
-/* Make clicks pass-through */
+/* Make clicks pass-through 
+
+#29d
+
+*/
 #nprogress {
   pointer-events: none;
 }
 
 #nprogress .bar {
-  background: #29d;
+  background: #FFDC00;
 
   position: fixed;
   z-index: 1031;

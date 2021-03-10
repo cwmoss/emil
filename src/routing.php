@@ -93,6 +93,19 @@ $router->before('GET|POST|DELETE', '/admin/.*', function() use ($router, $app, $
   }
 });
 
+$router->post('/login', function() use($app){
+    $secure = false;
+    $domain = "";
+    $path = "/";
+    $cookieopts = ['expires'=>0, 'path'=>$path, 'domain'=>$domain, 'secure'=>$secure, 'httponly'=>true, 'samesite'=>'Strict'];
+    dbg("== conf++", $app->get("conf"));
+    $jwt_in = $_COOKIE['emil'];
+    $jwt = check_jwt($app->get("conf")['jwt_secret'], $jwt_in);
+    dbg("== jwt", $jwt);
+    setcookie('emil', gen_jwt($app->get("conf")['jwt_secret'], 'admin'), $cookieopts);
+    resp(['ok'=>'logged in']);
+});
+
 $router->get("/ui", function() use($app){
     $secure = false;
     $domain = "";
