@@ -12,7 +12,7 @@ WIP - this is work in progress!
 - [ ] bulk send
 - [ ] mail headers/ mail address handling
 - [ ] add tests
-- :black_square_button: ui
+- [ ] ui
 
 ## goals
 
