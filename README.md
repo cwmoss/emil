@@ -83,15 +83,29 @@ All of this data can be used in templates. There are some special keys that are 
 
 
 ```
-# hd_warning.txt
+# message template: hd_warning.txt
 ---
 subject: our harddisc is full!
 to: admin@acme.com
 cc: paul@acme.com
+category: maintenance
+layout: default
 ---
 
 it happend again. please empty trash.
 
+```
+
+```
+# layout template: __default.txt
+***
+	{{> @partial-block }}
+***
+
+file under: {{category}}
+```
+
+```
 # send mail
 curl http://localhost:1199/send/acme/hd_warning -u api:9ecc433c... 
 ```
