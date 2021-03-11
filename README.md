@@ -79,7 +79,7 @@ All of this data can be used in templates. There are some special keys that are 
 
 * `to` receipients address
 * `from`, `cc`, `bcc`, `reply-to`, `subject`
-* `subject` is the only value, that can contain simple templating: `-d '{"subject":"hallo {{name}}"`
+* `subject` is the only value, that can contain simple templating: `-d '{"subject":"hallo {{name}}"}'`
 
 
 ```
