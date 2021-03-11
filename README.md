@@ -57,9 +57,53 @@ Template Engine is [LightnCandy](https://github.com/zordius/lightncandy) -- hand
 
 ### Template Naming Conventions
 
-* Layout templates starts with `__` (two underscores)
-* Partials starts with `_` (one underscore)
-* Message Templates starts with lowercase character
+* Layout template names start with `__` (two underscores)
+* Partials start with `_` (one underscore)
+* Message template names start with a lowercase character
+* Template files for the email html part end with `.html`
+* Template files for the email text part end with `.txt`
+* Image Names must end with either `.png` or `.jgp`. Only PNG + JPEG images are supported.
+* Maximum allowed file size is 100KB
+
+### Providing Template Data
+
+Template placeholder data can be provided in the following order -- highest priority first:
+
+* via `send` request as json POST data
+* via `txt` template as frontmatter data
+* via `html` template as frontmatter data
+* via organizations preferences data (can be set by the `POST manage/org/acme` request)
+
+
+All of this data can be used in templates. There are some special keys that are used for e-mail generation:
+
+* `to` receipients address
+* `from`, `cc`, `bcc`, `reply-to`, `subject`
+* `subject` is the only value, that can contain simple templating: `-d '{"subject":"hallo {{name}}"`
+
+
+```
+# hd_warning.txt
+---
+subject: our harddisc is full!
+to: admin@acme.com
+cc: paul@acme.com
+---
+
+it happend again. please empty trash.
+
+# send mail
+curl http://localhost:1199/send/acme/hd_warning -u api:9ecc433c... 
+```
+
+## Organizations Preferences
+
+Organizations need at least 2 options:  `api-key` (will be generated on creation) and `transport`, smtp account.
+`transport` can only be set by admin.
+`api-key` will be displayed only once on creation. it can be updated by organizations `manage/org/apikey` (??)
+
+All other preferences are treated as template/mailheader data.
+
 
 ## Authorization
 
