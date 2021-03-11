@@ -4,6 +4,16 @@ self hosted microservice for transactional, templated based email
 
 WIP - this is work in progress!
 
+## TODO
+
+- [ ] complete apib description
+- [ ] data flow for templates
+- [ ] who can edit transports?
+- [ ] bulk send
+- [ ] mail headers/ mail address handling
+- [ ] add tests
+- [ ] ui
+
 ## goals
 
 most of my apps require sending emails. while migrating to the cloud stack, i felt the need to have an email service via http that works the same way as my old in-app functions. i wanted to be able to host this service by myself. most of time i don't need most of the functionality of the big boys' services. so i don't want to subscribe to any service just to be able to send a bunch of mails a month. what i needed was templating. having a single layout for all html emails of one project. 
@@ -39,7 +49,6 @@ this service supports multiple tenants `orgs`.
 	 cd emil
 	 composer install
 	 # follow the instructions
-
 
 
 ## Templates
