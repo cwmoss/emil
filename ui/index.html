@@ -34,8 +34,19 @@
         </ul>
        </div>
 
-       <div id="org">
-        {{org}}
+       <div v-if="org" id="org">
+         {{org}}
+         <br><br><br><br><br>
+        <div id="props">
+          <div v-for="(value, name) in org.preferences">
+            <label>{{name}}</label> <span>{{value}}</span><br>
+          </div>
+        </div>
+        <div id="templates">
+          <li v-for="item in org.templates"><strong>{{item.name}}</strong><br>
+            <span>{{item.modified_at}}</span> <span>{{item.size}}</span>
+          </li>
+        </div>
        </div>
     </div>
 
@@ -100,7 +111,7 @@ const edapp = new Vue({
       loginerr: false,
       
       orgs: [],
-      org: null,
+      org: {preferences: {}, templates:[]},
 
       index: [], 
       cstory:{slug:'', title:''},

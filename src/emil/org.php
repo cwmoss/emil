@@ -5,23 +5,25 @@ class org
 {
     public $name;
     public $base;
-    
-    public function __construct($name, $base)
+    public $etc;
+
+    public function __construct($name, $base, $etc)
     {
         $this->name = $name;
         $this->base = $base;
+        $this->etc = $etc;
     }
     
     public function info()
     {
         $files = glob($this->base."/{$this->name}/*.{txt,html,png}", GLOB_BRACE);
         $tpls = array_map(function ($p) {
-            return \basename($p);
+            return $this->template_info($p);
         }, $files);
         return [
             'name' => $this->name,
             'templates' => $tpls,
-            'preferences' => []
+            'preferences' => $this->preferences()
         ];
     }
     
@@ -32,5 +34,21 @@ class org
             return \basename($p);
         }, $files);
         return ['orgs' => $orgs];
+    }
+
+    public function preferences()
+    {
+        dbg("+++ prefs for ", $this->name);
+        $p = org_options_read($this->etc, $this->name);
+        return $p;
+    }
+
+    public function template_info($file)
+    {
+        return [
+            'name' => \basename($file),
+            'size' => \filesize($file),
+            'modified_at' => date("Y-m-d H:i:s", filemtime($file))
+        ];
     }
 }
