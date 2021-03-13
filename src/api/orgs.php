@@ -24,6 +24,10 @@ class orgs
         return (new org($org, $base, $this->conf['etc']))->info();
     }
     
+    public function post_update($org, $data)
+    {
+        return (new org($org, $this->conf['base'], $this->conf['etc']))->update($data);
+    }
     public function post_create($name, $data=null)
     {
         // $p = gen_password();

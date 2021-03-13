@@ -35,11 +35,12 @@
        </div>
 
        <div v-if="org" id="org">
-         {{org}}
+         {{org}} <br><br>
+         {{org.preferences}}
          <br><br><br><br><br>
-        <div id="props">
+        <div id="props" :key="org.name">
           <div v-for="(value, name) in org.preferences">
-            <label>{{name}}</label> <span>{{value}}</span><br>
+            <qedit @changed="pref_change" :value="value" :name="name"></qedit>
           </div>
         </div>
         <div id="templates">
@@ -87,8 +88,12 @@
 
 <script src="ui/vue.js"></script>
 <script src="ui/nprogress.js"></script>
+<script src="ui/qedit.vue.js"></script>
 
 <script>
+
+Vue.component("Qedit", Qedit);
+
 
 NProgress.configure({ parent: 'body' }); 
 
@@ -126,8 +131,17 @@ const edapp = new Vue({
       // this.org = item;
       this.fetch("/admin/org/"+item).then(data => {
         this.org = data
+       // this.$set(this.org, 'preferences', data.preferences)
       })
 
+    },
+    pref_change: function(d){
+      console.log('need update', d)
+      var prefs = this.org.preferences
+      prefs[d.name] = d.value
+      this.fetch("/admin/org/"+this.org.name, prefs).then(data => {
+        this.org = data
+      })
     },
    do_login: function(){
       this.fetch('/login', {user:this.user, password:this.password}).then(data => {

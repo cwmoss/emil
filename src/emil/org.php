@@ -14,6 +14,12 @@ class org
         $this->etc = $etc;
     }
     
+    public function update($data)
+    {
+        dbg("+++ update etc for ", $this->name, $data);
+        org_options_update($this->etc, $this->name, $data);
+        return $this->info();
+    }
     public function info()
     {
         $files = glob($this->base."/{$this->name}/*.{txt,html,png}", GLOB_BRACE);

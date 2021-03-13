@@ -54,6 +54,8 @@ $router->before('POST|GET|PUT|DELETE', '/manage/(\w+)(/.*)?', function ($org) us
 
 $router->mount('/manage', function () use ($router) {
     $router->get('/(\w+)', "dispatcher::templates__get_projects");
+    $router->post('/(\w+)', "dispatcher::orgs__post_update");
+    
     $router->put('/(\w+)/upload/([\w.]+)', "dispatcher::templates__upload_stream");
     $router->post('/(\w+)/upload', "dispatcher::templates__upload");
     $router->delete('/(\w+)/([\w.]+)', "dispatcher::templates__delete");
@@ -62,7 +64,8 @@ $router->mount('/manage', function () use ($router) {
 $router->mount('/admin', function () use ($router) {
     $router->get('/orgs', "dispatcher::orgs__get_orgs");
     $router->get('/org/(\w+)', "dispatcher::orgs__get_org");
-    $router->post('/org/(\w+)', "dispatcher::orgs__post_create");
+    $router->post('/orgs/(\w+)', "dispatcher::orgs__post_create");
+    $router->post('/org/(\w+)', "dispatcher::orgs__post_update");
     $router->delete('/org/(\w+)', "dispatcher::orgs__delete");
 });
 
