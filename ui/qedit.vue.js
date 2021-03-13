@@ -2,15 +2,18 @@ const Qedit = {
     template: `
         <div>
           <label>{{k}}</label>
-          <div v-if="edit">
+          <div v-if="edit" class="value-edit">
             <input 
                 v-on:keyup.enter="save"
                 @keydown.esc="cancel"
                 v-focus
                v-model="v" type="text">
-            <span @click="cancel">cancel</span>
+            <div class="actions">
+              <button @click="save" class="primary">save</button>
+              <button @click="cancel" class="secondary">cancel</button>
+            </div>
           </div>
-          <div v-else @click="edit=true">{{v}}</div>
+          <div v-else @click="edit=true" class="value">{{v}}</div>
         </div>
     `,
     props:{

@@ -4,6 +4,7 @@
   <title>emil admin</title>
   <link rel="shortcut icon" type="image/x-icon" href="ui/favicon.png">
   <link rel='stylesheet' href='ui/nprogress.css'/>
+  <link rel='stylesheet' href='ui/mvp.css'/>
   <link rel='stylesheet' href='ui/app.css'/>
 
 <style>
@@ -24,31 +25,38 @@
 <body>
 
   <div id="admin-app">
+    <h1 class="logo">emil</h1>
+    
+     
 
-     <h1>emil</h1>
-
-     <div v-if="!login" class="content">
-       <div id="orgs">
-        <ul>
+     <div v-if="!login" class="xcontent">
+      <main class="grid">
+       <div class="smaller column">
+        <ul class="org-index">
           <li v-for="item in orgs"><a v-on:click="select_org(item)" href="javascript:;" v-bind:class="{active:(org && org.name==item)}"  v-html="item"></a>
         </ul>
        </div>
 
-       <div v-if="org" id="org">
-         {{org}} <br><br>
-         {{org.preferences}}
-         <br><br><br><br><br>
-        <div id="props" :key="org.name">
-          <div v-for="(value, name) in org.preferences">
-            <qedit @changed="pref_change" :value="value" :name="name"></qedit>
+       <div class="bigger column">
+        <div v-if="org" class="grid">
+          
+          <div id="props" :key="org.name" class="bigger column">
+            <p><mark>{{active}}</mark></p>
+            <div v-for="(value, name) in org.preferences">
+              <qedit @changed="pref_change" :value="value" :name="name"></qedit>
+            </div>
+          </div>
+
+          <div id="templates" class="column">
+            <ul>
+            <li v-for="item in org.templates"><strong>{{item.name}}</strong><br>
+              <span>{{item.modified_at}}</span> <span>{{item.size}}</span>
+            </li>
+          </ul>
           </div>
         </div>
-        <div id="templates">
-          <li v-for="item in org.templates"><strong>{{item.name}}</strong><br>
-            <span>{{item.modified_at}}</span> <span>{{item.size}}</span>
-          </li>
         </div>
-       </div>
+      </main>
     </div>
 
     <div v-else class="login">
@@ -81,7 +89,7 @@
     </div>
 
 
-
+  
 
   </div>
 
@@ -91,6 +99,12 @@
 <script src="ui/qedit.vue.js"></script>
 
 <script>
+var hour = new Date().getHours()
+var isNight = hour < 6 || hour > 21
+if (isNight) {
+  var html = document.getElementsByTagName('html')[0]
+  html.classList.add('dark')
+}
 
 Vue.component("Qedit", Qedit);
 
@@ -148,6 +162,7 @@ const edapp = new Vue({
          console.log("data...", data)
          if(data.ok){
           this.login=false
+          this.init()
          }else{
           this.loginerr=true
          setTimeout(() => {
@@ -188,36 +203,33 @@ const edapp = new Vue({
 
        console.log("++ resp", res)
        return await res.json()
+    },
+    /*
+      on mount
+      or after timeout of token + new login
+    */
+    init: function(){
+      this.fetch('/admin/orgs').then(data => {
+        console.log("data...", data)
+        this.orgs = data.orgs
+      })
+      if(this.active){
+        this.fetch("/admin/org/"+this.active).then(data => {
+          this.org = data
+        })
+      }
     }
   },
   mounted: function(){
     console.log("mounting");
     var vm = this;
     vm.index = window.__INIT_DATA__;
-    this.fetch('/admin/orgs').then(data => {
-      console.log("data...", data)
-      this.orgs = data.orgs
-    })
+    this.init()
     
-      
-    
-    /*
-    this.$modal.beforeOpen = function(e){
-      console.log(e);
-    };
-*/
-    /*
-    $axios.get('/all')
-      .then(function (response) {
-      // handle success
-      console.log(response.data);
-      vm.index = response.data;
-    });
-    */
   }
 });
 
-// }, 50000);
+
 
 </script>
 </body>
