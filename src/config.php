@@ -5,12 +5,13 @@ use function DI\factory;
 use function DI\create;
 use function DI\get;
 
-function get_env(){
+function get_env()
+{
     return array_merge($_SERVER, getenv());
 }
 
-function get_config($env){
-    $appbase = realpath(__DIR__."/../");
+function get_config($env, $appbase)
+{
     // $conf = parse_ini_file($appbase."/emil.ini");
     $conf = [];
 
@@ -19,21 +20,22 @@ function get_config($env){
     $conf['appbase'] = $appbase;
 
     $conf['transport'] = $env['EMIL_MAIL_TRANSPORT'];
-    $conf['jwt_secret'] = $env['EMIL_JWT_SECRET'];
+//    $conf['jwt_secret'] = $env['EMIL_JWT_SECRET'];
     return $conf;
 }
 
 return [
-    'env' =>function(){
+    'appbase' => function () {
+        return realpath(__DIR__."/../");
+    },
+    'env' =>function () {
         return get_env();
     },
-    'conf' => function(ContainerInterface $c){
+    'conf' => function (ContainerInterface $c) {
         dbg("+++ config load");
-        return get_config($c->get('env'));
+        return get_config($c->get('env'), $c->get('appbase'));
     },
-    'appbase' => function (ContainerInterface $c) {
-        return $c->get('conf')['appbase'];
-    },
+    
     'base' => function (ContainerInterface $c) {
         return $c->get('conf')['base'];
     },
@@ -52,5 +54,7 @@ return [
         ->constructor(get('conf')),
     emil\mailer::class => create()
         ->constructor(get('conf')),
+    emil\auth::class => create()
+        ->constructor(get('env')),
 
 ];

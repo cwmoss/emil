@@ -6,6 +6,6 @@
 #    at onErrorNT (internal/child_process.js:467:16)
 #    at processTicksAndRejections (internal/process/task_queues.js:84:21)
 
-EMIL_ADMIN_KEY=testMe EMIL_JWT_SECRET=TLSbkGXD5TtkrmxLhV1Roy3Nqwvl9LfygklDa2ZDJ2uDTlDHv2JI59Eq4aa5YNxSq0iSg3-D-PEcAF4YC-UwfA php -S localhost:1199 -t public/ public/index.php
+php -S localhost:1199 -t public/ public/index.php
 
 

@@ -27,7 +27,7 @@
 
      <h1>emil</h1>
 
-     <div v-if="login" class="content">
+     <div v-if="!login" class="content">
        <div id="orgs">
         <ul>
           <li v-for="item in orgs"><a v-on:click="select_org(item)" href="javascript:;" v-bind:class="{active:(org && org.name==item)}"  v-html="item"></a>
@@ -71,7 +71,7 @@
 
 
 
-</div>
+  </div>
 
 
 <script src="ui/vue.js"></script>
@@ -119,13 +119,17 @@ const edapp = new Vue({
 
     },
    do_login: function(){
-      this.fetch('/login', {}).then(data => {
+      this.fetch('/login', {user:this.user, password:this.password}).then(data => {
          console.log("data...", data)
-         //this.login=true
-         this.loginerr=true
+         if(data.ok){
+          this.login=false
+         }else{
+          this.loginerr=true
          setTimeout(() => {
            this.loginerr = false
          }, 2000)
+         }
+        
        })
    },
     save_content: function(){
