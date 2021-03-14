@@ -45,14 +45,31 @@ class auth
         return ['err'=>'login failed'];
     }
 
+    public function logout()
+    {
+        dbg("logout data", $post, $this->env);
+        
+        $this->delete_cookie("admin");
+        return ['ok'=>'logged out'];
+    }
+
+    public function delete_cookie()
+    {
+        $this->set_cookie("");
+    }
     public function set_cookie($user)
     {
+        if ($user) {
+            $jwt = gen_jwt($this->env['EMIL_JWT_SECRET'], $user);
+        } else {
+            $jwt = "";
+        }
+        
         $secure = false;
         $domain = "";
         $path = "/";
         $cookieopts = ['expires'=>0, 'path'=>$path, 'domain'=>$domain,
             'secure'=>$secure, 'httponly'=>true, 'samesite'=>'Strict'];
-        $jwt = gen_jwt($this->env['EMIL_JWT_SECRET'], $user);
         setcookie('emil', $jwt, $cookieopts);
     }
     

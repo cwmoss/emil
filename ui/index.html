@@ -32,9 +32,11 @@
      <div v-if="!login" class="xcontent">
       <main class="grid">
        <div class="smaller column">
+         
         <ul class="org-index">
           <li v-for="item in orgs"><a v-on:click="select_org(item)" href="javascript:;" v-bind:class="{active:(org && org.name==item)}"  v-html="item"></a>
         </ul>
+        <button @click="do_logout">Logout</button>
        </div>
 
        <div class="bigger column">
@@ -236,6 +238,18 @@ const edapp = new Vue({
         
        })
    },
+    do_logout: function(){
+      this.fetch('/logout', {}).then(data => {
+         console.log("data...", data)
+         if(data.ok){
+          this.login=true
+          
+         }else{
+          
+         }
+        
+       })
+    },
     fetch: async function(url, data){
        var opts = {}
        if(data){

@@ -82,6 +82,15 @@ $router->post('/login', function () use ($app) {
             ->login(get_json_req())
     );
 });
+$router->post('/logout', function () use ($router, $app) {
+    $auth = $app->make("emil\\auth");
+    $hdrs = $router->getRequestHeaders();
+    $auth->is_authorized_admin($hdrs);
+
+    resp(
+        $auth->logout()
+    );
+});
 
 $router->get("/ui", function () use ($app) {
     dbg("++ send index file");
