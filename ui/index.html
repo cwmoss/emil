@@ -41,10 +41,27 @@
         <div v-if="org" class="grid">
           
           <div id="props" :key="org.name" class="bigger column">
+
             <p><mark>{{active}}</mark></p>
-            <div v-for="(value, name) in org.preferences">
-              <qedit @changed="pref_change" :value="value" :name="name"></qedit>
+            <div class="grid thirds">
+              <div class="smaller column">
+                <input v-model="new_k" type="text" placeholder="key">
+              </div> 
+              <div class="column">
+                <input v-model="new_v" type="text" placeholder="value">
+              </div>
+              <div class="smaller column">
+                <button @click="pref_add">+</button>
+              </div>
             </div>
+            <transition-group name="prop-list" tag="div">
+              <div v-for="(item, index) in preferences" :key="item.k">
+                <qedit @changed="pref_change" 
+                  :value="item.v" :name="item.k" :key="item.k">
+                  <span @click="pref_remove(item)" class="remove">X</span>
+                </qedit>
+              </div>
+            </transition-group>
           </div>
 
           <div id="templates" class="column">
@@ -106,6 +123,29 @@ if (isNight) {
   html.classList.add('dark')
 }
 
+function obj_to_array(obj){
+  var arr = Object.keys(obj).map(function(key, index) {
+    return {k:key, v:obj[key]}
+  })
+  arr.sort(function(a, b) {
+    if (a.k < b.k) {
+      return -1;
+    }
+    if (a.k > b.k) {
+      return 1;
+    }
+    return 0;
+  })
+  return arr
+}
+
+function array_to_object(arr){
+  return arr.reduce(function(result, val) {
+    result[val.k] = val.v
+    return result
+  }, {})
+}
+
 Vue.component("Qedit", Qedit);
 
 
@@ -129,9 +169,12 @@ const edapp = new Vue({
       password: null,
       loginerr: false,
       
+      new_k: "",
+      new_v: "",
+
       orgs: [],
       org: {preferences: {}, templates:[]},
-
+      preferences: [],
       index: [], 
       cstory:{slug:'', title:''},
       estory:{}
@@ -145,16 +188,37 @@ const edapp = new Vue({
       // this.org = item;
       this.fetch("/admin/org/"+item).then(data => {
         this.org = data
+        this.preferences = obj_to_array(data.preferences)
        // this.$set(this.org, 'preferences', data.preferences)
       })
 
     },
+    pref_add: function(){
+      if(this.new_k){
+        this.preferences.unshift({
+          k: this.new_k,
+          v: this.new_v
+        })
+        this.new_k = this.new_v = ""
+      }
+      this.update_prefs()
+    },
     pref_change: function(d){
       console.log('need update', d)
-      var prefs = this.org.preferences
+      var prefs = array_to_object(this.preferences)
       prefs[d.name] = d.value
+      this.update_prefs(prefs)
+    },
+    pref_remove: function(item){
+      console.log('need update ++ remove', item)
+      this.preferences.splice(this.preferences.indexOf(item), 1)
+      this.update_prefs()
+    },
+    update_prefs: function(obj){
+      var prefs = obj || array_to_object(this.preferences)
       this.fetch("/admin/org/"+this.org.name, prefs).then(data => {
         this.org = data
+        this.preferences = obj_to_array(data.preferences)
       })
     },
    do_login: function(){
@@ -172,13 +236,6 @@ const edapp = new Vue({
         
        })
    },
-    save_content: function(){
-      var that = this;
-      $axios.post('/story-save-content', {id: that.story.id, content: that.story.o_content})
-        .then(resp => {
-          if(resp.data) that.story = resp.data;
-        });
-    },
     fetch: async function(url, data){
        var opts = {}
        if(data){
@@ -216,6 +273,7 @@ const edapp = new Vue({
       if(this.active){
         this.fetch("/admin/org/"+this.active).then(data => {
           this.org = data
+          this.preferences = obj_to_array(data.preferences)
         })
       }
     }

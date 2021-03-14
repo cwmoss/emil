@@ -1,7 +1,7 @@
 const Qedit = {
     template: `
         <div>
-          <label>{{k}}</label>
+          <label>{{k}}</label> <slot></slot>
           <div v-if="edit" class="value-edit">
             <input 
                 v-on:keyup.enter="save"
@@ -35,6 +35,10 @@ const Qedit = {
       save: function(){
         console.log("saveing", this.k, this.v)
         this.$emit("changed", {name:this.k, value:this.v})
+        this.edit = false
+      },
+      remove: function(){
+        this.$emit("removed", {name:this.k, value:this.v})
         this.edit = false
       }
     },

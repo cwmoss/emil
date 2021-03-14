@@ -34,6 +34,10 @@
     background-color: white;
   }
 
+  .prop-list-move {
+    transition: transform 0.5s;
+  }
+
 /*
   silver grid
   https://mtm.dev/grid
