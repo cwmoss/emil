@@ -1,9 +1,24 @@
 
-  body{
+  body, html{
 /*     background: url(ui/mesh.png) no-repeat center center fixed;*/
-     background: url(amoled-leaf-wallpapers.jpg) no-repeat center center fixed;
-     padding: 0;
-     background-size: cover;
+     
+     padding: 0;  
+     height: 100%;
+  }
+  .login-screen{
+    background: url(amoled-leaf-wallpapers.jpg) no-repeat center center fixed;
+    background-size: cover;
+    height: 100%;
+    /* padding-top:100px; */
+  }
+  #admin-app{
+    height: 100%;
+  }
+  nav{
+    margin-bottom: 1rem;
+  }
+  footer, header, main{
+    padding:0;
   }
   h1.logo{
     background-color: white;
@@ -12,7 +27,40 @@
     position: absolute;
   }
 
+  span.logo{
+    background-color: black;
+    color: white;
+    display: inline-block;
+    padding: 8px;
+    font-size:24px;
+  }
 
+  .slide-fade-enter-active {
+    transition: all .2s ease;
+  }
+  .slide-fade-leave-active {
+    transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  }
+  .slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active below version 2.1.8 */ {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  div.c-message {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center; }
+  div.c-message p {
+    margin: 0; }
+
+  .piano{
+    color:#aaa;
+  }
+  .sm{
+    font-size: smaller;
+  }
   .value{
     background-color: #f4f4f4;
     word-break: break-all;
@@ -21,17 +69,17 @@
   .value-edit input{
     width:80%;
     margin-bottom: 6px;
-    border: 2px solid black;
+    /* border: 2px solid black; */
   }
   .value-edit button{
     font-size: 11px;
 
   }
   button.secondary{
-    background-color: #ddd;
+    /* background-color: #ddd; */
   }
   button.secondary:hover{
-    background-color: white;
+    /* background-color: white; */
   }
 
   .prop-list-move {
@@ -46,11 +94,14 @@
     display: flex;
     flex-wrap: wrap;
   }
-
+  .grid.nowrap{
+    flex-wrap: nowrap;
+  }
+  
   .column {
     box-sizing: border-box;
     flex: 1;
-    padding: 1rem;
+    padding: 0 1rem;
   }
   
   .bigger { flex: 2.5; }
@@ -68,14 +119,21 @@
     padding: 0;
     list-style-type: none;
   }
-  .org-index{
-    margin-top:85px;
+  .org-index a{
+    color:black;
+    padding:4px;
+    text-decoration: none;
+  }
+  .org-index a.active{
+    color:white;
+    background-color: black;
   }
   main{
     background-color: white;
   }
   .login{
-    margin:36px auto;
+    margin:0 auto;
+    padding-top:100px;
     width:50vh;
     min-height: 50vh;
     /*background: white;*/
@@ -129,6 +187,10 @@
     padding: 4px;
   }
   button{
+    margin:0;
+    padding:0 4px;
+  }
+  .login button{
     color: black;
     border: 2px solid black;
     font-weight: bold;
@@ -138,7 +200,7 @@
     margin-bottom: 0;
     margin-top: 0;
   }
-  button:hover{
+  .login button:hover{
     background: #ffff00;
   }
 

@@ -23,20 +23,27 @@
 </style>
 </head>
 <body>
-
   <div id="admin-app">
-    <h1 class="logo">emil</h1>
-    
-     
+ 
+    <transition name="slide-fade" mode="out-in">
 
-     <div v-if="!login" class="xcontent">
+     <div v-if="!login" class="xcontent" key="edit">
+      <header>
+        
+        <nav><span class="logo">emil</span><ul><li><a href="javascript:;" @click="do_logout">Logout</a></li></ul></nav>
+      </header>
+    
+      
+      
       <main class="grid">
+
+          
        <div class="smaller column">
          
         <ul class="org-index">
           <li v-for="item in orgs"><a v-on:click="select_org(item)" href="javascript:;" v-bind:class="{active:(org && org.name==item)}"  v-html="item"></a>
         </ul>
-        <button @click="do_logout">Logout</button>
+     
        </div>
 
        <div class="bigger column">
@@ -44,8 +51,9 @@
           
           <div id="props" :key="org.name" class="bigger column">
 
-            <p><mark>{{active}}</mark></p>
-            <div class="grid thirds">
+            <h3>{{active}}</h3>
+            
+            <div class="grid nowrap">
               <div class="smaller column">
                 <input v-model="new_k" type="text" placeholder="key">
               </div> 
@@ -69,17 +77,22 @@
           <div id="templates" class="column">
             <ul>
             <li v-for="item in org.templates"><strong>{{item.name}}</strong><br>
-              <span>{{item.modified_at}}</span> <span>{{item.size}}</span>
+              <span class="piano sm">{{item.modified_at}}</span> <span class="piano sm">{{item.size}}</span>
             </li>
           </ul>
           </div>
+        </div>
+        <div v-else class="c-message">
+          <p class="piano">please choose<br>an organization</p>
         </div>
         </div>
       </main>
     </div>
 
-    <div v-else class="login">
+    <div v-else class="login-screen" key="login">
 
+      <h1 class="logo">emil</h1>
+      <div class="login">
        <transition name="bounce">
           <div v-if="loginerr" class="error"><img src="ui/hate.gif">
           </div>
@@ -104,9 +117,9 @@
           </div>
         </div>
       </form>
-            
     </div>
-
+    </div>
+  </transition>
 
   
 
@@ -175,7 +188,7 @@ const edapp = new Vue({
       new_v: "",
 
       orgs: [],
-      org: {preferences: {}, templates:[]},
+      org: null,
       preferences: [],
       index: [], 
       cstory:{slug:'', title:''},
