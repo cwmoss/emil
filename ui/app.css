@@ -78,16 +78,24 @@
     border: 1px solid #f4f4f4;
     word-break: break-all;
     padding: 0.4rem 0.8rem;
+    font-family: var(--font-mono);
   }
   .value-edit input{
     box-sizing: border-box;
     width:100%;
     margin-bottom: 6px;
+    line-height: 24px;
+    font-family: var(--font-mono);
     /* border: 2px solid black; */
   }
   .value-edit button{
     font-size: 11px;
     
+  }
+  .new_data{
+    background-color: #f4f4f4;
+    margin-bottom: 36px;
+    padding-top: 16px;
   }
   button.secondary{
     /* background-color: #ddd; */
@@ -227,7 +235,7 @@
   margin-top: 0;
 }
 label{
-  width:14%;
+/*  width:14%;*/
   display: inline-block;
 }
 .startscreen{
