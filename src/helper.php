@@ -2,33 +2,29 @@
 use Ahc\Jwt\JWT;
 use Ahc\Jwt\JWTException;
 
-function resp($data)
-{
-    header("Content-Type: application/json"); #; charset=utf-8
+function resp($data) {
+    header('Content-Type: application/json'); //; charset=utf-8
     print json_encode($data);
 
-    dbg("+++ finished");
+    dbg('+++ finished');
 }
 
-function e404($msg='not found')
-{
+function e404($msg = 'not found') {
     header('HTTP/1.1 404 Not Found');
-    resp(['fail'=>$msg]);
+    resp(['fail' => $msg]);
 }
 
-function e401($msg='unauthorized api request')
-{
-    dbg("+++ 401 +++ ");
-    header("HTTP/1.1 401 Unauthorized");
-    resp(['fail'=>$msg]);
+function e401($msg = 'unauthorized api request') {
+    dbg('+++ 401 +++ ');
+    header('HTTP/1.1 401 Unauthorized');
+    resp(['fail' => $msg]);
     exit;
 }
 
-function dbg($txt, ...$vars)
-{
+function dbg($txt, ...$vars) {
     // im servermodus wird der zeitstempel automatisch gesetzt
     //	$log = [date('Y-m-d H:i:s')];
-    $log= [];
+    $log = [];
     if (!is_string($txt)) {
         array_unshift($vars, $txt);
     } else {
@@ -38,73 +34,63 @@ function dbg($txt, ...$vars)
     error_log(join(' ', $log));
 }
 
-function get_json_and_raw_req()
-{
+function get_json_and_raw_req() {
     $raw = get_raw_req();
     $post = json_decode($raw, true);
     return [$post, $raw];
 }
 
-function get_json_req()
-{
+function get_json_req() {
     return json_decode(get_raw_req(), true);
 }
 
-function get_raw_req()
-{
-    dbg("++++ raw input read ++++");
+function get_raw_req() {
+    dbg('++++ raw input read ++++');
     return file_get_contents('php://input');
 }
 
-function url_to_pdo_dsn($url)
-{
+function url_to_pdo_dsn($url) {
     $parts = parse_url($url);
 
     return [
-        $parts['scheme'].':host='.$parts['host'].';dbname='.trim($parts['path'], '/'),
+        $parts['scheme'] . ':host=' . $parts['host'] . ';dbname=' . trim($parts['path'], '/'),
         $parts['user'],
         $parts['pass']
     ];
 }
 
-function gen_secret($bytes=32)
-{
+function gen_secret($bytes = 32) {
     return rtrim(strtr(base64_encode(random_bytes($bytes)), '+/', '-_'), '=');
 }
 
-function gen_secret_hex($bytes=32)
-{
+function gen_secret_hex($bytes = 32) {
     return bin2hex(random_bytes($bytes));
 }
 
-function gen_password($len=15)
-{
-    $chars =  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.
+function gen_password($len = 15) {
+    $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' .
             '0123456789-!?@#$%#';
 
     $str = '';
     $max = strlen($chars) - 1;
 
-    for ($i=0; $i < $len; $i++) {
+    for ($i = 0; $i < $len; $i++) {
         $str .= $chars[random_int(0, $max)];
     }
 
     return $str;
 }
 
-function gen_jwt_secret()
-{
+function gen_jwt_secret() {
     return gen_secret(64);
 }
 
-function gen_jwt($secret, $org)
-{
-    $token   = (new JWT($secret, 'HS256', 1800))->encode(['org' => $org, 'scopes' => ['user']]);
+function gen_jwt($secret, $org) {
+    $token = (new JWT($secret, 'HS256', 1800))->encode(['org' => $org, 'scopes' => ['user']]);
     return $token;
 }
 
-function check_jwt($secret, $token)
-{
+function check_jwt($secret, $token) {
     // TODO: let it crash
     if (!$secret || !$token) {
         return false;
@@ -121,16 +107,14 @@ function check_jwt($secret, $token)
 /*
 password_verify ( string $password , string $hash )
 */
-function array_blocklist($arr, $block)
-{
+function array_blocklist($arr, $block) {
     if (is_string($block)) {
-        $block = explode(" ", $block);
+        $block = explode(' ', $block);
     }
     return array_diff_key($arr, array_flip($block));
 }
 
-function normalize_files_array($files = [])
-{
+function normalize_files_array($files = []) {
     $normalized_array = [];
 
     foreach ($files as $index => $file) {
@@ -153,41 +137,38 @@ function normalize_files_array($files = [])
     return $normalized_array;
 }
 
-function stream_to_file($name)
-{
+function stream_to_file($name) {
     $tmpfname = tempnam(sys_get_temp_dir(), 'emil-');
     file_put_contents($tmpfname, file_get_contents('php://input'));
     return [
-    'name' => $name,
-    'type' => 'stream',
-    'tmp_name' => $tmpfname,
-    'error' => 0,
-    'size' => filesize($tmpfname)
-  ];
+        'name' => $name,
+        'type' => 'stream',
+        'tmp_name' => $tmpfname,
+        'error' => 0,
+        'size' => filesize($tmpfname)
+    ];
 }
 
-function send_file($base, $file)
-{
+function send_file($base, $file) {
     $file = basename($file);
     if (preg_match('/css$/', $file)) {
-        header("Content-Type: text/css");
+        header('Content-Type: text/css');
     } elseif (preg_match('/js$/', $file)) {
-        header("Content-Type: text/javascript");
+        header('Content-Type: text/javascript');
     } elseif (preg_match('/html$/', $file)) {
-        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
-        header("Content-Type: text/html");
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
+        header('Content-Type: text/html');
     }
-    dbg("sending", $base.'/ui/'.$file);
-    readfile($base.'/ui/'.$file);
+    dbg('sending', $base . '/ui/' . $file);
+    readfile($base . '/ui/' . $file);
 }
 
-function get_trace_from_exception($e)
-{
+function get_trace_from_exception($e) {
     $class = get_class($e);
     $pclass = get_parent_class($e);
-    $m=$e->getMessage();
+    $m = $e->getMessage();
 
     $fm = sprintf(
         "%s:\n   %s line: %s code: %s\n   via %s%s\n",
@@ -196,26 +177,23 @@ function get_trace_from_exception($e)
         $e->getLine(),
         $e->getCode(),
         $class,
-        $pclass?', '.$pclass:''
+        $pclass ? ', ' . $pclass : ''
     );
-    $trace .= $fm.$e->getTraceAsString();
+    $trace .= $fm . $e->getTraceAsString();
     return $trace;
 }
 
-function check_admin($hdrs, $server)
-{
-    #dbg("+++ check admin ", $server);
+function check_admin($hdrs, $server) {
+    //dbg("+++ check admin ", $server);
     return check_auth(['admin', 'X-Emil-Admin', 'EMIL_ADMIN_KEY'], $hdrs, $server);
 }
 
-function check_api($hdrs, $server, $etc_org)
-{
+function check_api($hdrs, $server, $etc_org) {
     $server['ORG_PWD'] = $etc_org['api_key'];
     return check_auth(['api', 'X-Emil-Api', 'ORG_PWD'], $hdrs, $server);
 }
 
-function check_auth($key_names, $hdrs, $server)
-{
+function check_auth($key_names, $hdrs, $server) {
     list($basicuser, $xheader, $envsecret) = $key_names;
     if (!$server[$envsecret]) {
         return false;
@@ -224,32 +202,29 @@ function check_auth($key_names, $hdrs, $server)
     // first check for auth xheader
     // then for basic-auth header basicuser
     if (isset($hdrs[$xheader])) {
-        return ($server[$envsecret]===$hdrs[$xheader]);
+        return ($server[$envsecret] === $hdrs[$xheader]);
     } else {
         // php has a shortcut here
         // _SERVER:  PHP_AUTH_USER":"robert","PHP_AUTH_PW":"seeeeecret"
-        return ($server['PHP_AUTH_USER']===$basicuser && $server['PHP_AUTH_PW'] === $server[$envsecret]);
+        return ($server['PHP_AUTH_USER'] === $basicuser && $server['PHP_AUTH_PW'] === $server[$envsecret]);
     }
     return false;
 }
 
-function org_options_read($base, $name)
-{
+function org_options_read($base, $name) {
     $cont = file_get_contents("{$base}/{$name}.json");
     if (!$cont) {
         return [];
     }
     $data = json_decode($cont, true);
-    return $data?:[];
+    return $data ?: [];
 }
 
-function org_options_save($base, $name, $data)
-{
+function org_options_save($base, $name, $data) {
     return file_put_contents("{$base}/{$name}.json", json_encode($data));
 }
 
-function org_options_update($base, $name, $data)
-{
+function org_options_update($base, $name, $data) {
     return org_options_save($base, $name, array_merge(
         org_options_read($base, $name),
         $data

@@ -1,7 +1,7 @@
 <?php
-$loader = require __DIR__.'/../vendor/autoload.php';
+$loader = require __DIR__ . '/../vendor/autoload.php';
 
-if (PHP_SAPI=='cli') {
+if (PHP_SAPI == 'cli') {
     $log = '/dev/stdout';
 } else {
     $log = join('/', [__DIR__, '..', 'logs', 'app.log']);
@@ -23,39 +23,36 @@ with dots
     	"SCRIPT_NAME": "\/manage\/acme\/upload\/test.jpg",
     	"SCRIPT_FILENAME": "public\/index.php",
 */
-if (PHP_SAPI=='cli-server') {
-    if (strpos($_SERVER['REQUEST_URI'], '.')!==false) {
-        dbg("+++ env hack!");
-        $_SERVER['SCRIPT_NAME'] = '/'.basename($_SERVER['SCRIPT_FILENAME']);
+if (PHP_SAPI == 'cli-server') {
+    if (strpos($_SERVER['REQUEST_URI'], '.') !== false) {
+        dbg('+++ env hack!');
+        $_SERVER['SCRIPT_NAME'] = '/' . basename($_SERVER['SCRIPT_FILENAME']);
     }
 }
 
 ini_set('error_log', $log);
 
-dbg("app started", PHP_SAPI);
+dbg('app started', PHP_SAPI);
 
 $builder = new DI\ContainerBuilder();
 $builder->useAutowiring(false);
 $builder->useAnnotations(false);
-$builder->addDefinitions(__DIR__.'/config.php');
+$builder->addDefinitions(__DIR__ . '/config.php');
 $app = $builder->build();
 
 // in production we will not have a .env file
-if (file_exists($app->get("appbase").'/.env')) {
-    dbg("dotenv started");
-    Dotenv\Dotenv::createImmutable($app->get("appbase"))->load();
+if (file_exists($app->get('appbase') . '/.env')) {
+    dbg('dotenv started');
+    Dotenv\Dotenv::createImmutable($app->get('appbase'))->load();
 }
 
-
-function api_exception_handler($e)
-{
+function api_exception_handler($e) {
     $trace = get_trace_from_exception($e);
 
-    print json_encode(['exception'=>$trace]);
+    print json_encode(['exception' => $trace]);
 }
 
-function api_error_handler($fehlercode, $fehlertext, $fehlerdatei, $fehlerzeile)
-{
+function api_error_handler($fehlercode, $fehlertext, $fehlerdatei, $fehlerzeile) {
     if (!(error_reporting() & $fehlercode)) {
         // Dieser Fehlercode ist nicht in error_reporting enthalten
         return false;
@@ -65,6 +62,5 @@ function api_error_handler($fehlercode, $fehlertext, $fehlerdatei, $fehlerzeile)
 
 set_exception_handler('api_exception_handler');
 set_error_handler('api_error_handler');
-
 
 return $app;
