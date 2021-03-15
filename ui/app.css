@@ -80,10 +80,14 @@
     padding: 0.4rem 0.8rem;
     font-family: var(--font-mono);
   }
+  .value-edit{
+    margin:-8px;
+    background-color: chartreuse;
+  }
   .value-edit input{
     box-sizing: border-box;
     width:100%;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
     line-height: 24px;
     font-family: var(--font-mono);
     /* border: 2px solid black; */
