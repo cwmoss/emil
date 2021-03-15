@@ -61,19 +61,25 @@
   .sm{
     font-size: smaller;
   }
+  .keyvalue{
+    margin-bottom: 16px;
+  }
   .value{
+    box-sizing: border-box;
     background-color: #f4f4f4;
+    border: 1px solid #f4f4f4;
     word-break: break-all;
     padding: 0.4rem 0.8rem;
   }
   .value-edit input{
-    width:80%;
+    box-sizing: border-box;
+    width:100%;
     margin-bottom: 6px;
     /* border: 2px solid black; */
   }
   .value-edit button{
     font-size: 11px;
-
+    
   }
   button.secondary{
     /* background-color: #ddd; */

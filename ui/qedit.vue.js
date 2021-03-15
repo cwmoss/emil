@@ -1,6 +1,6 @@
 const Qedit = {
     template: `
-        <div>
+        <div class="keyvalue">
           <label>{{k}}</label> <slot></slot>
           <div v-if="edit" class="value-edit">
             <input 
