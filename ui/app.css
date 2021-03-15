@@ -81,8 +81,9 @@
     font-family: var(--font-mono);
   }
   .value-edit{
-    margin:-8px;
-    background-color: chartreuse;
+   /* margin:-8px;
+    background-color: yellow;
+    */
   }
   .value-edit input{
     box-sizing: border-box;
