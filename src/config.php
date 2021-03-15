@@ -5,18 +5,16 @@ use function DI\factory;
 use function DI\create;
 use function DI\get;
 
-function get_env()
-{
+function get_env() {
     return array_merge($_SERVER, getenv());
 }
 
-function get_config($env, $appbase)
-{
+function get_config($env, $appbase) {
     // $conf = parse_ini_file($appbase."/emil.ini");
     $conf = [];
 
-    $conf['base'] = $appbase."/templates";
-    $conf['etc'] = $appbase."/etc";
+    $conf['base'] = $appbase . '/templates';
+    $conf['etc'] = $appbase . '/etc';
     $conf['appbase'] = $appbase;
 
     $conf['transport'] = $env['EMIL_MAIL_TRANSPORT'];
@@ -26,16 +24,16 @@ function get_config($env, $appbase)
 
 return [
     'appbase' => function () {
-        return realpath(__DIR__."/../");
+        return realpath(__DIR__ . '/../');
     },
-    'env' =>function () {
+    'env' => function () {
         return get_env();
     },
     'conf' => function (ContainerInterface $c) {
-        dbg("+++ config load");
+        dbg('+++ config load');
         return get_config($c->get('env'), $c->get('appbase'));
     },
-    
+
     'base' => function (ContainerInterface $c) {
         return $c->get('conf')['base'];
     },
@@ -56,5 +54,4 @@ return [
         ->constructor(get('conf')),
     emil\auth::class => create()
         ->constructor(get('env')),
-
 ];
