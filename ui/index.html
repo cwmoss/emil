@@ -68,7 +68,7 @@
               <div v-for="(item, index) in preferences" :key="item.k">
                 <qedit @changed="pref_change" 
                   :value="item.v" :name="item.k" :key="item.k">
-                  <span @click="pref_remove(item)" class="remove">X</span>
+                  <a href="javascript:;" @click="pref_remove(item)" class="remove"><img src="ui/delete_forever-24px.svg"></a>
                 </qedit>
               </div>
             </transition-group>
@@ -113,7 +113,7 @@
         </div>
         <div class="felement btn">
           <div class="inp">
-            <button type="submit" @click="do_login">Login</button>
+            <button type="submit" @click="do_login">Login <img src="ui/enhanced_encryption-24px.svg"></button>
           </div>
         </div>
       </form>
@@ -220,7 +220,7 @@ const edapp = new Vue({
     pref_change: function(d){
       console.log('need update', d)
       var prefs = array_to_object(this.preferences)
-      prefs[d.name] = d.value
+      prefs[d.name] = d.value 
       this.update_prefs(prefs)
     },
     pref_remove: function(item){

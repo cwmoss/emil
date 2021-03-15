@@ -155,6 +155,8 @@ function send_file($base, $file) {
         header('Content-Type: text/css');
     } elseif (preg_match('/js$/', $file)) {
         header('Content-Type: text/javascript');
+    } elseif (preg_match('/svg$/', $file)) {
+        header('Content-Type: image/svg+xml');
     } elseif (preg_match('/html$/', $file)) {
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
