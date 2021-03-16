@@ -88,8 +88,8 @@
 
             <ul>
               <transition-group name="prop-list" tag="ul">
-              <li v-for="item in templates" :key="item.name"><strong>{{item.name}}</strong><br>
-                <span class="piano sm">{{item.modified_at}}</span> <span class="piano sm">{{item.size}}</span>
+              <li v-for="item in templates" :key="item.name"><strong class="breakable">{{item.name}}</strong><br>
+                <span class="piano sm" :title="item.modified_at">{{mdate(item.modified_at)}}</span> <span class="piano sm" v-html="size(item.size)" :title="item.size"></span>
               </li>
             </transition-group>
           </ul>
@@ -190,6 +190,17 @@ function array_to_object(arr){
     result[val.k] = val.v
     return result
   }, {})
+}
+
+function humanFileSize(size) {
+    var i = Math.floor( Math.log(size) / Math.log(1024) );
+    return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+}
+
+function mdate(value){
+  value = value.replace(/-/g, '/')
+  let date = new Date(value)
+	return date.toLocaleDateString()+' '+date.toLocaleTimeString()
 }
 
 Vue.component("Qedit", Qedit);
@@ -321,6 +332,12 @@ const edapp = new Vue({
          }
         
        })
+    },
+    size: function(s){
+      return humanFileSize(s)
+    },
+    mdate: function(d){
+      return mdate(d)
     },
     fetch: async function(url, data){
        var opts = {}

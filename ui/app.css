@@ -72,6 +72,9 @@
     height: 18px;
     margin-bottom: -2px;
   }
+  .breakable{
+    word-break: break-all;
+  }
   .value{
     box-sizing: border-box;
     background-color: #f4f4f4;
