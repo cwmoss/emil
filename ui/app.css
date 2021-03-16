@@ -75,6 +75,15 @@
   .breakable{
     word-break: break-all;
   }
+  .input-file{
+    display: none;
+  }
+  label.upload{
+    padding: 0.4rem 0.8rem;
+  }
+  .icon-file{
+    height: 28px;
+  }
   .value{
     box-sizing: border-box;
     background-color: #f4f4f4;

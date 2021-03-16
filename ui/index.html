@@ -81,7 +81,10 @@
             <div class="new_data fbox">
 
               <div class="smaller column">
-                <input type="file" name="upload" ref="files" @change="handle_upload">
+                <label class="upload">
+                  <input type="file" name="upload" ref="files" @change="handle_upload" class="input-file">
+                  <img src="ui/cloud_upload-24px.svg" class="icon-file">
+               </label>
               </div> 
              
             </div>
