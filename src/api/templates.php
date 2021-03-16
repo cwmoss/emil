@@ -11,7 +11,7 @@ class templates {
     }
 
     public function get_templates($org, $project) {
-        return (new org($org, $this->conf['base']))->info();
+        return (new org($org, $this->conf['base'], $this->conf['etc']))->info();
     }
 
     // {"u":{"name":["__twenty.html"],"type":["text\/html"],"tmp_name":["\/private\/var\/tmp\/phpLgnLTl"],"error":[0],"size":[8900]}}

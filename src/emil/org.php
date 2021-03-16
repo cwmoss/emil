@@ -20,7 +20,7 @@ class org {
     }
 
     public function info() {
-        $files = glob($this->base . "/{$this->name}/*.{txt,html,png}", GLOB_BRACE);
+        $files = glob($this->base . "/{$this->name}/*.{txt,html,png,jpg}", GLOB_BRACE);
         $tpls = array_map(function ($p) {
             return $this->template_info($p);
         }, $files);

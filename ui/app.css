@@ -124,13 +124,29 @@
   .grid.nowrap{
     flex-wrap: nowrap;
   }
-  
+  .fbox{
+    display:flex;
+  }
+  .fbox input{
+    width: 85px;
+  }
   .column {
     box-sizing: border-box;
     flex: 1;
     padding: 0 1rem;
   }
-  
+  .manage-area{
+    padding:0;
+  }
+  .panel input{
+    width:80%;
+  }
+  .panel button{
+    width:20%;
+  }
+  .panel input, .panel button{
+    display: inline-block;
+  }
   .bigger { flex: 2.5; }
   .smaller { flex: 0.5; }
   .halves .column  { flex: 0 0 50%; }

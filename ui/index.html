@@ -30,7 +30,7 @@
      <div v-if="!login" class="xcontent" key="edit">
       <header>
         
-        <nav><span class="logo">emil</span><ul><li><a href="javascript:;" @click="do_logout">Logout</a></li></ul></nav>
+        <nav><span class="logo">emil</span><ul><li v-if="org">{{org.name}}</li><li><a href="javascript:;" @click="do_logout">Logout</a></li></ul></nav>
       </header>
     
       
@@ -38,7 +38,7 @@
       <main class="grid">
 
           
-       <div class="smaller column">
+       <div class="smaller column" v-if="!org">
          
         <ul class="org-index">
           <li v-for="item in orgs"><a v-on:click="select_org(item)" href="javascript:;" v-bind:class="{active:(org && org.name==item)}"  v-html="item"></a>
@@ -46,12 +46,12 @@
      
        </div>
 
-       <div class="bigger column">
-        <div v-if="org" class="grid">
+       <div class="manage-area bigger column">
+        <div v-if="org" class="grid nowrap">
           
           <div id="props" :key="org.name" class="bigger column">
 
-            <h3>{{active}}</h3>
+            <h3>Data</h3>
             
             <div class="new_data grid nowrap">
               <div class="smaller column">
@@ -75,11 +75,43 @@
           </div>
 
           <div id="templates" class="column">
+            
+            <h3>Templates</h3>
+
+            <div class="new_data fbox">
+
+              <div class="smaller column">
+                <input type="file" name="upload" ref="files" @change="handle_upload">
+              </div> 
+             
+            </div>
+
             <ul>
-            <li v-for="item in org.templates"><strong>{{item.name}}</strong><br>
-              <span class="piano sm">{{item.modified_at}}</span> <span class="piano sm">{{item.size}}</span>
-            </li>
+              <transition-group name="prop-list" tag="ul">
+              <li v-for="item in templates" :key="item.name"><strong>{{item.name}}</strong><br>
+                <span class="piano sm">{{item.modified_at}}</span> <span class="piano sm">{{item.size}}</span>
+              </li>
+            </transition-group>
           </ul>
+          </div>
+          <div id="api-keys" class="column">
+            <h3>API Keys</h3>
+
+            <div class="new_data fbox">
+
+              <div class="smaller column">
+                <input v-model="new_apikey" type="text" placeholder="description">
+              </div> 
+             
+              <div class="smaller column">
+                <button @click="apikey_add">+</button>
+              </div>
+            </div>
+
+            <ul>
+              <li v-for="item in api_keys"><strong>{{item}}</strong>
+              </li>
+            </ul>
           </div>
         </div>
         <div v-else class="c-message">
@@ -186,9 +218,15 @@ const edapp = new Vue({
       new_k: "",
       new_v: "",
 
+      new_apikey: "",
+
+      new_files: [],
+
       orgs: [],
       org: null,
       preferences: [],
+      api_keys: [],
+      templates: [],
       index: [], 
       cstory:{slug:'', title:''},
       estory:{}
@@ -201,9 +239,7 @@ const edapp = new Vue({
       this.active = item;
       // this.org = item;
       this.fetch("/admin/org/"+item).then(data => {
-        this.org = data
-        this.preferences = obj_to_array(data.preferences)
-       // this.$set(this.org, 'preferences', data.preferences)
+        this.set_org(data)
       })
 
     },
@@ -231,9 +267,33 @@ const edapp = new Vue({
     update_prefs: function(obj){
       var prefs = obj || array_to_object(this.preferences)
       this.fetch("/admin/org/"+this.org.name, prefs).then(data => {
-        this.org = data
-        this.preferences = obj_to_array(data.preferences)
+        this.set_org(data)
       })
+    },
+    handle_upload(){
+      console.log("files", this.new_files)
+      let org = this.org.name
+      this.new_files = this.$refs.files.files
+      console.log("files", this.new_files)
+      let body = [...this.new_files].reduce(function(res, val){
+        res.append('u[]', val, val.name)
+        return res}, new FormData)
+      console.log("have body", body.constructor.name, {}.constructor.name, body)
+      this.fetch('/manage/'+org+'/upload', body).then(data=>{
+        console.log("+++ upload res", data)
+        this.fetch("/admin/org/"+org).then(data => {
+          this.set_org(data)
+        })
+      })
+    },
+    apikey_add: function(){
+      console.log("add api key", this.new_apikey)
+    },
+    set_org: function(data){
+      this.org = {name: data.name}
+      this.templates = data.templates
+      this.preferences = obj_to_array(data.preferences)
+      this.api_keys = ['default']
     },
    do_login: function(){
       this.fetch('/login', {user:this.user, password:this.password}).then(data => {
@@ -265,7 +325,12 @@ const edapp = new Vue({
     fetch: async function(url, data){
        var opts = {}
        if(data){
-          opts.body = JSON.stringify(data)
+          if(data.constructor.name=='FormData'){
+            opts.body = data
+          }else{
+            opts.body = JSON.stringify(data)
+          }
+         
           opts.method = 'POST'
       }
       NProgress.start()
@@ -298,8 +363,7 @@ const edapp = new Vue({
       })
       if(this.active){
         this.fetch("/admin/org/"+this.active).then(data => {
-          this.org = data
-          this.preferences = obj_to_array(data.preferences)
+          this.set_org(data)
         })
       }
     }
