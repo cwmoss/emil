@@ -12,13 +12,20 @@
     /* padding-top:100px; */
   }
   #admin-app{
-    height: 100%;
+   /* height: 100%;*/
   }
   nav{
     margin-bottom: 1rem;
   }
-  footer, header, main{
+  header, main{
     padding:0;
+  }
+  footer{
+    color: white;
+    background-color: black;
+    padding:16px 0;
+    margin: 36px 0 0 0;
+    max-width: none;
   }
   h1.logo{
     background-color: white;
