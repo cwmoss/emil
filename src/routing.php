@@ -55,9 +55,9 @@ $router->mount('/manage', function () use ($router) {
     $router->get('/(\w+)', 'dispatcher::templates__get_projects');
     $router->post('/(\w+)', 'dispatcher::orgs__post_update');
 
-    $router->put('/(\w+)/upload/([\w.]+)', 'dispatcher::templates__upload_stream');
+    $router->put('/(\w+)/upload/([-\w.]+)', 'dispatcher::templates__upload_stream');
     $router->post('/(\w+)/upload', 'dispatcher::templates__upload');
-    $router->delete('/(\w+)/([\w.]+)', 'dispatcher::templates__delete');
+    $router->delete('/(\w+)/([-\w.]+)', 'dispatcher::templates__delete');
 });
 
 $router->mount('/admin', function () use ($router) {
