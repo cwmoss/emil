@@ -35,7 +35,7 @@ class orgs {
         $org = [
             'name' => $name,
             //	'password' => password_hash($p, PASSWORD_DEFAULT),
-            'api_key' => gen_secret()
+            'api_keys' => [['key' => gen_secret(), 'name' => 'default']]
         ];
         $data_ok = array_blocklist($data, 'api_key password name');
         $org = array_merge($org, $data_ok);
@@ -50,8 +50,27 @@ class orgs {
         return $org;
     }
 
-    public function post_update_api_key($name, $data = []) {
-        \org_options_update($this->conf['etc'], $name, ['api_key' => gen_secret()]);
+    public function post_add_api_key($name, $keyname, $data = []) {
+        $keys = \org_options_read($this->conf['etc'], $name)['api_keys'];
+        $newkey = ['key' => \gen_secret(), 'name' => $keyname];
+        $keys[] = $newkey;
+        \org_options_update($this->conf['etc'], $name, ['api_keys' => $keys]);
+        return $newkey;
+    }
+
+    public function delete_api_key($name, $keyname) {
+        dbg('++ suche key', $keyname);
+
+        $keys = \org_options_read($this->conf['etc'], $name)['api_keys'];
+        dbg('kk', $keys);
+        $found = array_search_fun(fn ($k) => $k['name'] == $keyname, $keys);
+        if ($found) {
+            $keys = array_delete($keys, $found[0]);
+            \org_options_update($this->conf['etc'], $name, ['api_keys' => $keys]);
+            return ['ok' => $keyname . ' deleted'];
+        } else {
+            return ['err' => 'keyname not found'];
+        }
     }
 
     public function delete($name) {

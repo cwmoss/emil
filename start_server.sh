@@ -6,6 +6,6 @@
 #    at onErrorNT (internal/child_process.js:467:16)
 #    at processTicksAndRejections (internal/process/task_queues.js:84:21)
 
-php -S localhost:1199 -t public/ public/index.php
+php -S 127.0.0.1:1199 -t public/ public/index.php
 
 

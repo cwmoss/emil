@@ -49,6 +49,11 @@ function get_raw_req() {
     return file_get_contents('php://input');
 }
 
+function get_req_headers($router) {
+    dbg('+++ router get headers');
+    return array_change_key_case($router->getRequestHeaders());
+}
+
 function url_to_pdo_dsn($url) {
     $parts = parse_url($url);
 
@@ -112,6 +117,19 @@ function array_blocklist($arr, $block) {
         $block = explode(' ', $block);
     }
     return array_diff_key($arr, array_flip($block));
+}
+function array_search_fun($needle_fun, $haystack) {
+    foreach ($haystack as $k => $v) {
+        if (call_user_func($needle_fun, $v) === true) {
+            return [$k, $v];
+        }
+    }
+    return null;
+}
+
+function array_delete($array, $idx) {
+    array_splice($array, $idx, 1);
+    return $array;
 }
 
 function normalize_files_array($files = []) {
@@ -186,13 +204,13 @@ function get_trace_from_exception($e) {
 }
 
 function check_admin($hdrs, $server) {
-    //dbg("+++ check admin ", $server);
-    return check_auth(['admin', 'X-Emil-Admin', 'EMIL_ADMIN_KEY'], $hdrs, $server);
+    dbg('+++ check admin ', $hdrs, getallheaders());
+    return check_auth(['admin', 'x-emil-admin', 'EMIL_ADMIN_KEY'], $hdrs, $server);
 }
 
 function check_api($hdrs, $server, $etc_org) {
-    $server['ORG_PWD'] = $etc_org['api_key'];
-    return check_auth(['api', 'X-Emil-Api', 'ORG_PWD'], $hdrs, $server);
+    $server['ORG_PWD'] = array_map(fn ($k) => $k['key'], $etc_org['api_keys']);
+    return check_auth(['api', 'x-emil-api', 'ORG_PWD'], $hdrs, $server);
 }
 
 function check_auth($key_names, $hdrs, $server) {
@@ -200,17 +218,23 @@ function check_auth($key_names, $hdrs, $server) {
     if (!$server[$envsecret]) {
         return false;
     }
+    $secrets = $server[$envsecret];
 
     // first check for auth xheader
     // then for basic-auth header basicuser
     if (isset($hdrs[$xheader])) {
-        return ($server[$envsecret] === $hdrs[$xheader]);
+        return equal_or_in_array($hdrs[$xheader], $secrets);
     } else {
         // php has a shortcut here
         // _SERVER:  PHP_AUTH_USER":"robert","PHP_AUTH_PW":"seeeeecret"
-        return ($server['PHP_AUTH_USER'] === $basicuser && $server['PHP_AUTH_PW'] === $server[$envsecret]);
+        return ($server['PHP_AUTH_USER'] === $basicuser && equal_or_in_array($server['PHP_AUTH_PW'], $secrets));
     }
     return false;
+}
+
+function equal_or_in_array($needle, $haystack) {
+    return (is_array($haystack) && in_array($needle, $haystack)) ||
+        (!is_array($haystack) && $needle == $haystack);
 }
 
 function org_options_read($base, $name) {

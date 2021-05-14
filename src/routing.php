@@ -40,20 +40,23 @@ $router->mount('/send', function () use ($router, $app) {
 $router->before('POST', '/send/(\w+)/.*', function ($org) use ($router, $app) {
     dbg('AUTH send', $org);
 
-    $hdrs = $router->getRequestHeaders();
+    $hdrs = get_req_headers($router);
     $app->make('emil\\auth')->is_authorized($hdrs, $org, org_options_read($app->get('etc'), $org));
 });
 
 $router->before('POST|GET|PUT|DELETE', '/manage/(\w+)(/.*)?', function ($org) use ($router, $app) {
     dbg('AUTH manage', $org);
 
-    $hdrs = $router->getRequestHeaders();
+    $hdrs = get_req_headers($router);
     $app->make('emil\\auth')->is_authorized($hdrs, $org, org_options_read($app->get('etc'), $org));
 });
 
 $router->mount('/manage', function () use ($router) {
     $router->get('/(\w+)', 'dispatcher::templates__get_projects');
     $router->post('/(\w+)', 'dispatcher::orgs__post_update');
+
+    $router->post('/(\w+)/apikey/([-\w]+)', 'dispatcher::orgs__post_add_api_key');
+    $router->delete('/(\w+)/apikey/([-\w]+)', 'dispatcher::orgs__delete_api_key');
 
     $router->put('/(\w+)/upload/([-\w.]+)', 'dispatcher::templates__upload_stream');
     $router->post('/(\w+)/upload', 'dispatcher::templates__upload');
@@ -71,7 +74,7 @@ $router->mount('/admin', function () use ($router) {
 $router->before('GET|POST|DELETE', '/admin/.*', function () use ($router, $app, $data) {
     dbg('AUTH admin');
 
-    $hdrs = $router->getRequestHeaders();
+    $hdrs = get_req_headers($router);
     $app->make('emil\\auth')->is_authorized_admin($hdrs);
 });
 
@@ -83,7 +86,7 @@ $router->post('/login', function () use ($app) {
 });
 $router->post('/logout', function () use ($router, $app) {
     $auth = $app->make('emil\\auth');
-    $hdrs = $router->getRequestHeaders();
+    $hdrs = get_req_headers($router);
     $auth->is_authorized_admin($hdrs);
 
     resp(
