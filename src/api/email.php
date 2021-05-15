@@ -4,6 +4,7 @@ namespace api;
 
 use function emil\template\process;
 use function emil\template\process_string;
+use function emil\template\load_helper;
 use function emil\template\get_data;
 
 class email {
@@ -21,13 +22,15 @@ class email {
     // xorc\mailer::send('register', ['to'=>$this->registration->email], ['u'=>$this->registration]);
 
     public function send($template, $data) {
+        $helper = load_helper();
         [$views, $data] = process($template, $data, [
             'base' => $this->base,
+            'helper' => $helper,
             'frontparser' => $this->frontparser,
             'types' => ['txt', 'html']
         ]);
 
-        $data['subject'] = process_string($data['subject'], $data);
+        $data['subject'] = process_string($data['subject'], $data, $helper);
         dbg('++ data', $data);
 
         try {

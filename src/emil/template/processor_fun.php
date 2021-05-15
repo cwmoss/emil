@@ -23,10 +23,10 @@ function process($name, $data, $opts) {
     $data = array_merge($opts_data, $templates[1]['d'], $templates[0]['d'], $data);
     $layout = name_layout($data['layout']);
 
-    $templates = array_map(function ($t) use ($layout) {
+    $templates = array_map(function ($t) use ($layout, $opts) {
         $src = add_layout_tag($t['b'], $t['c'], $layout, $t['t']);
         $t['c2'] = $src;
-        $runner = compile($src, $t);
+        $runner = compile($src, $t, $opts['helper']);
         $t['run'] = $runner;
         return $t;
     }, $templates);
@@ -57,6 +57,9 @@ function load_template($base, $name, $type) {
         'x' => $exists,
         'z' => $exists ? file_get_contents($fname) : ''
     ];
+}
+function load_helper() {
+    return include __DIR__ . '/hb_helper.php';
 }
 function parse_yaml($content, $parser) {
     $document = $parser->parse($content, false);
@@ -99,20 +102,20 @@ function load_partial($base, $name, $type) {
     return "[partial (file:$fname) not found]";
 }
 
-function compile($src, $ctx) {
+function compile($src, $ctx, $helper = []) {
     return LightnCandy::compile(
         $src,
         [
             'partialresolver' => function ($cx, $name) use ($ctx) {
                 return load_partial($ctx['b'], $name, $ctx['t']);
             },
-            'helpers' => [
+            'helpers' => array_merge([
                 'embed' => function ($context, $options) use ($processor) {
                     // im compile step nix tun,
                     // erst im runstep wird die embedliste produziert
                     return $context;
-                }
-            ],
+                },
+            ], $helper),
             'flags' => LightnCandy::FLAG_ERROR_LOG | LightnCandy::FLAG_RUNTIMEPARTIAL
         ]
     );
@@ -140,7 +143,7 @@ function get_data($key) {
     return $this->tfiles['txt']['d'][$key];
 }
 
-function process_string($str, $data) {
-    $r = eval(LightnCandy::compile($str));
+function process_string($str, $data, $helper) {
+    $r = eval(LightnCandy::compile($str, ['helpers' => $helper]));
     return $r($data);
 }
