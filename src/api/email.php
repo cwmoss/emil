@@ -30,6 +30,8 @@ class email {
         ];
         $opts['helper'] = load_helper($opts);
 
+        dbg('++ md test', $opts['helper']['markdown']('**hi**'));
+
         [$views, $data] = process($template, $data, $opts);
 
         $data['subject'] = process_string($data['subject'], $data, $opts['helper']);

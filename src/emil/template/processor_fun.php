@@ -91,9 +91,11 @@ function load_template($base, $name, $type) {
         'z' => $exists ? file_get_contents($fname) : ''
     ];
 }
+
 function load_helper($opts) {
     return include __DIR__ . '/hb_helper.php';
 }
+
 function parse_yaml($content, $parser) {
     $document = $parser->parse($content, false);
     return [
