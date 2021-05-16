@@ -7,8 +7,7 @@ return [
     'pluralize0' => function ($total, $zero, $singular, $plural) {
         return (!$total) ? $zero : ($total == 1 ? $singular : $plural);
     },
-    'markdown' => function ($md) {
-        $pd = new Parsedown();
-        return $pd->text($md);
+    'markdown' => function ($md) use ($opts) {
+        return $opts['markdown']->text($md);
     }
 ];

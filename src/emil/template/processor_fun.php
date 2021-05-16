@@ -19,6 +19,7 @@ function process($name, $data, $opts) {
 
     //$layout = pick_layout($data, $templates[0]['d'],
     //    $templates[1]['d'], $opts);
+    $templates = unfold_md_template($templates, $opts);
 
     $data = array_merge($opts_data, $templates[1]['d'], $templates[0]['d'], $data);
     $layout = name_layout($data['layout']);
@@ -36,7 +37,39 @@ function process($name, $data, $opts) {
         return array_merge($t, $res);
     }, $templates);
 
+    $templates = array_map(fn ($t) => post_process($t, $opts), $templates);
+
     return [$templates, $data];
+}
+
+function unfold_md_template($templates) {
+    // kein md template?
+    if (!$templates[0]['x']) {
+        \array_shift($templates);
+        return $templates;
+    }
+    $unfold = [$templates[0], $templates[0]];
+    $unfold[0]['t'] = 'txt';
+    $unfold[0]['pp'] = 'md';
+    $unfold[1]['t'] = 'html';
+    $unfold[1]['pp'] = 'md';
+    $unfold[1]['c'] = sprintf('<!-- pp:md -->%s<!-- pp:md -->', $unfold[1]['c']);
+    return $unfold;
+}
+
+function post_process($t, $opts) {
+    if ($t['t'] == 'html' && $t['pp'] == 'md') {
+        $parts = explode('<!-- pp:md -->', $t['res']);
+        if ($parts[2]) {
+            $parts[1] = markdown($parts[1], $opts['markdown']);
+            $t['res'] = join("\n", $parts);
+        }
+    }
+    return $t;
+}
+
+function markdown($md, $parser) {
+    return $parser->text($md);
 }
 
 function array_blocklist($arr, $block) {
@@ -58,7 +91,7 @@ function load_template($base, $name, $type) {
         'z' => $exists ? file_get_contents($fname) : ''
     ];
 }
-function load_helper() {
+function load_helper($opts) {
     return include __DIR__ . '/hb_helper.php';
 }
 function parse_yaml($content, $parser) {
@@ -143,7 +176,7 @@ function get_data($key) {
     return $this->tfiles['txt']['d'][$key];
 }
 
-function process_string($str, $data, $helper) {
+function process_string($str, $data, $helper = []) {
     $r = eval(LightnCandy::compile($str, ['helpers' => $helper]));
     return $r($data);
 }

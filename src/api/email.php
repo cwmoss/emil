@@ -22,15 +22,17 @@ class email {
     // xorc\mailer::send('register', ['to'=>$this->registration->email], ['u'=>$this->registration]);
 
     public function send($template, $data) {
-        $helper = load_helper();
-        [$views, $data] = process($template, $data, [
+        $opts = [
             'base' => $this->base,
-            'helper' => $helper,
             'frontparser' => $this->frontparser,
-            'types' => ['txt', 'html']
-        ]);
+            'markdown' => new \Parsedown(),
+            'types' => ['md', 'txt', 'html']
+        ];
+        $opts['helper'] = load_helper($opts);
 
-        $data['subject'] = process_string($data['subject'], $data, $helper);
+        [$views, $data] = process($template, $data, $opts);
+
+        $data['subject'] = process_string($data['subject'], $data, $opts['helper']);
         dbg('++ data', $data);
 
         try {

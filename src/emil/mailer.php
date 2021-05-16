@@ -24,7 +24,7 @@ class mailer {
     public function transport() {
         //var_dump($this->conf);
         $cred = parse_url($this->conf['transport']);
-        var_dump($cred);
+        // var_dump($cred);
         //log_debug($cred);
         if ($cred['scheme'] == 'smtp') {
             $transport = new \Swift_SmtpTransport($cred['host'], $cred['port'] ? $cred['port'] : 25);
