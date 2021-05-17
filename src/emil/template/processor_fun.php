@@ -151,7 +151,7 @@ function compile($src, $ctx, $helper = []) {
                     return $context;
                 },
             ], $helper),
-            'flags' => LightnCandy::FLAG_ERROR_LOG | LightnCandy::FLAG_RUNTIMEPARTIAL
+            'flags' => LightnCandy::FLAG_ERROR_LOG | LightnCandy::FLAG_RUNTIMEPARTIAL | LightnCandy::FLAG_ADVARNAME
         ]
     );
 }
