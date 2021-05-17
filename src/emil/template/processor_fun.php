@@ -179,6 +179,9 @@ function get_data($key) {
 }
 
 function process_string($str, $data, $helper = []) {
-    $r = eval(LightnCandy::compile($str, ['helpers' => $helper]));
+    $r = eval(LightnCandy::compile($str, [
+        'helpers' => $helper,
+        'flags' => LightnCandy::FLAG_ERROR_LOG | LightnCandy::FLAG_RUNTIMEPARTIAL | LightnCandy::FLAG_ADVARNAME
+    ]));
     return $r($data);
 }
