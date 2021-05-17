@@ -41,6 +41,8 @@ class email {
 
         [$views, $data] = process($template, $data, $opts);
 
+        dbg('++ before subject', $data['subject']);
+
         $data['subject'] = process_string($data['subject'], $data, $opts['helper']);
         dbg('++ data', $data);
 
