@@ -11,19 +11,24 @@ class email {
     public $mailer;
     public $processor;
     public $frontparser;
-    public $base;
+    public $org;
 
-    public function __construct(\emil\mailer $mailer, $frontparser, $base) {
+    public function __construct(\emil\org $org, \emil\mailer $mailer, $frontparser) {
         $this->mailer = $mailer;
         $this->frontparser = $frontparser;
-        $this->base = $base;
+        $this->org = $org;
     }
 
     // xorc\mailer::send('register', ['to'=>$this->registration->email], ['u'=>$this->registration]);
 
     public function send($template, $data) {
+        // TODO: etc/data
+        $orgdata = $this->org->preferences();
+        //var_dump($orgdata);
+        $this->mailer->conf['transport'] = $orgdata['transport'];
+        //var_dump($this->mailer);
         $opts = [
-            'base' => $this->base,
+            'base' => $this->org->orgbase,
             'frontparser' => $this->frontparser,
             'markdown' => new \Parsedown(),
             'types' => ['md', 'txt', 'html']

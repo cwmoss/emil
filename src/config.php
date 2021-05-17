@@ -41,13 +41,20 @@ return [
         return $c->get('conf')['etc'];
     },
     'frontparser' => create('Mni\FrontYAML\Parser'),
+    emil\org::class => create()
+        ->constructor(
+            get('base'),
+            get('etc'),
+            get('orgname')
+        ),
     api\email::class => create()
         ->constructor(
+            get(emil\org::class),
             get(emil\mailer::class),
             get('frontparser')
         ),
     api\templates::class => create()
-        ->constructor(get('conf')),
+        ->constructor(get(emil\org::class)),
     api\orgs::class => create()
         ->constructor(get('conf')),
     emil\mailer::class => create()

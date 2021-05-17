@@ -22,37 +22,38 @@ $router->get('/', function () use ($req) {
 });
 
 $router->mount('/send', function () use ($router, $app) {
-    $router->post('/(\w+)/(\w+)(/\w+)?', function ($org, $project, $template = null) use ($app) {
-        if (!$template) {
-            $template = $project;
-            $project = '';
-        }
-
+    $router->post('/(\w+)/(\w+)', function ($orgname, $template) use ($app) {
         dbg('post project email');
 
-        $api = $app->make(api\email::class, ['base' => $app->get('base') . "/$org/$project"]);
+        // $org = $app->make(emil\org::class, ['name' => $orgname]);
+
+        $api = $app->make(api\email::class);
         $data = get_json_req();
-        dbg('send', $org, $project, $data);
+        dbg('send', $orgname, $data, $org);
         resp($api->send($template, $data));
     });
 });
 
-$router->before('POST', '/send/(\w+)/.*', function ($org) use ($router, $app) {
-    dbg('AUTH send', $org);
+$router->before('POST', '/send/(\w+)/.*', function ($orgname) use ($router, $app) {
+    dbg('AUTH send', $orgname);
+
+    $app->set('orgname', $orgname);
 
     $hdrs = get_req_headers($router);
-    $app->make('emil\\auth')->is_authorized($hdrs, $org, org_options_read($app->get('etc'), $org));
+    $app->make('emil\\auth')->is_authorized($hdrs, $orgname, org_options_read($app->get('etc'), $orgname));
 });
 
-$router->before('POST|GET|PUT|DELETE', '/manage/(\w+)(/.*)?', function ($org) use ($router, $app) {
-    dbg('AUTH manage', $org);
+$router->before('POST|GET|PUT|DELETE', '/manage/(\w+)(/.*)?', function ($orgname) use ($router, $app) {
+    dbg('AUTH manage', $orgname);
+
+    $app->set('orgname', $orgname);
 
     $hdrs = get_req_headers($router);
-    $app->make('emil\\auth')->is_authorized($hdrs, $org, org_options_read($app->get('etc'), $org));
+    $app->make('emil\\auth')->is_authorized($hdrs, $orgname, org_options_read($app->get('etc'), $orgname));
 });
 
 $router->mount('/manage', function () use ($router) {
-    $router->get('/(\w+)', 'dispatcher::templates__get_projects');
+    $router->get('/(\w+)', 'dispatcher::templates__get_templates');
     $router->post('/(\w+)', 'dispatcher::orgs__post_update');
 
     $router->post('/(\w+)/apikey/([-\w]+)', 'dispatcher::orgs__post_add_api_key');

@@ -3,15 +3,14 @@
 namespace api;
 
 class templates {
-    public $conf;
+    public $org;
 
-    public function __construct($conf, $processor = null) {
-        $this->conf = $conf;
-        $this->processor = $processor;
+    public function __construct($org) {
+        $this->org = $org;
     }
 
-    public function get_templates($org, $project) {
-        return (new org($org, $this->conf['base'], $this->conf['etc']))->info();
+    public function get_templates() {
+        return $this->org->info();
     }
 
     // {"u":{"name":["__twenty.html"],"type":["text\/html"],"tmp_name":["\/private\/var\/tmp\/phpLgnLTl"],"error":[0],"size":[8900]}}
@@ -21,17 +20,17 @@ class templates {
         $files = normalize_files_array($_FILES);
         dbg($files);
         if ($files['u']) {
-            return $this->_checkin_files($files['u'], $this->conf['base'] . "/{$org}/{$project}");
+            return $this->_checkin_files($files['u'], $this->org->orgbase);
         }
         return [];
     }
 
     public function upload_stream($org, $name) {
-        return $this->_checkin_files([stream_to_file($name)], $this->conf['base'] . "/{$org}/{$project}");
+        return $this->_checkin_files([stream_to_file($name)], $this->org->orgbase);
     }
 
     public function delete($org, $name) {
-        $file = $this->conf['base'] . "/{$org}/$name";
+        $file = $this->org->orgbase . "/$name";
         unlink($file);
         return ['ok' => $name . ' deleted'];
     }

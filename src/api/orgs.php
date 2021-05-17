@@ -22,7 +22,7 @@ class orgs {
     }
 
     public function post_update($org, $data) {
-        return (new org($org, $this->conf['base'], $this->conf['etc']))->update($data);
+        return (new org($this->conf['base'], $this->conf['etc'], $org))->update($data);
     }
 
     public function post_create($name, $data = null) {

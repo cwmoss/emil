@@ -6,11 +6,13 @@ class org {
     public $name;
     public $base;
     public $etc;
+    public $orgbase;
 
-    public function __construct($name, $base, $etc) {
+    public function __construct($base, $etc, $name) {
         $this->name = $name;
         $this->base = $base;
         $this->etc = $etc;
+        $this->orgbase = "{$this->base}/{$this->name}/";
     }
 
     public function update($data) {
