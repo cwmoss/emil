@@ -24,6 +24,8 @@ class email {
     public function send($template, $data) {
         // TODO: etc/data
         $orgdata = $this->org->preferences();
+        $data = array_merge($orgdata, $data);
+
         //var_dump($orgdata);
         $this->mailer->conf['transport'] = $orgdata['transport'];
         //var_dump($this->mailer);
@@ -48,24 +50,6 @@ class email {
                 'html' => $views[1]['res'],
                 'embeds' => $views[1]['embeds']
             ], $data);
-        } catch (\throwable $e) {
-            return ['err' => get_trace_from_exception($e)];
-        }
-
-        return ['res' => 'ok sent'];
-    }
-
-    public function sendx($template, $data, $hdrs) {
-        dbg('++ send data', $data);
-
-        $views = $this->processor->process($template, $data);
-
-        $subject = $this->processor->get_data('subject') ?? $data['subject'];
-        $subject = $this->processor->process_string($subject, $data);
-        $data['subject'] = $subject;
-
-        try {
-            $this->mailer->send($views, $data);
         } catch (\throwable $e) {
             return ['err' => get_trace_from_exception($e)];
         }
