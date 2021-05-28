@@ -1,0 +1,12 @@
+scalar Email
+
+type Query {
+  hello(name: String!, data: Email): [Message]
+
+}
+
+type Message{
+    type: String
+    body: String
+    data: Email
+}

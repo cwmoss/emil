@@ -24,6 +24,8 @@
         "mnapoli/front-yaml": "^1.8",
         "swiftmailer/swiftmailer": "^6.0",
         "php-di/php-di": "^6.3",
-        "erusev/parsedown": "^1.7"
+        "erusev/parsedown": "^1.7",
+        "webonyx/graphql-php": "^14.7",
+        "leocavalcante/siler": "^1.7"
     }
 }
