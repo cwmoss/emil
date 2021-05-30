@@ -1,12 +1,41 @@
-scalar Email
+scalar EmilData
 
-type Query {
-  hello(name: String!, data: Email): [Message]
+input EmilRecipientInput{
+  email: String
+  name: String
+  data: EmilData
+}
+
+type EmilRecipient{
+  email: String
+  name: String
+  data: EmilData
+}
+
+type EmilSendResponse{
+  summary: EmilSendSummary
+  details: [EmilSendDetails]
+}
+
+type EmilSendSummary{
+  sent: Int
+  failed: Int
+}
+
+type EmilSendDetails{
+    email: String
+    status: String
+    msg: String
+}
+
+type Query{
+  hello: String
+}
+
+type Mutation {
+
+  send(template: String!, recipient: EmilRecipientInput, data: EmilData): EmilSendResponse
+  bulk(template: String!, recipient: [EmilRecipientInput], data: EmilData): EmilSendResponse
 
 }
 
-type Message{
-    type: String
-    body: String
-    data: Email
-}

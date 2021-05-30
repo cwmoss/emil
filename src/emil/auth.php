@@ -3,8 +3,9 @@
 namespace emil;
 
 class auth {
-    public function __construct($env) {
+    public function __construct($env, $return = false) {
         $this->env = $env;
+        $this->return = $return;
     }
 
     public function is_authorized_admin($hdrs) {
@@ -14,7 +15,9 @@ class auth {
         if ($this->check_jwt('admin')) {
             return true;
         }
-
+        if ($this->return) {
+            return false;
+        }
         e401();
     }
 

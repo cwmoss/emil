@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/dispatcher.php';
+use Siler\GraphQL;
 
 error_reporting(E_ALL & ~E_NOTICE);
 
@@ -104,6 +105,19 @@ $router->get("/ui/([-\w.]+)", function ($file) use ($app) {
     dbg('++ send file', $file);
     send_file($app->get('appbase'), $file);
 });
+
+$router->post("/graphql/(\w+)", function ($orgname) use ($router, $app) {
+    dbg('++ graphql org', $orgname);
+    $app->set('orgname', $orgname);
+
+    $schema = include __DIR__ . '/schema.php';
+    $hdrs = get_req_headers($router);
+    $auth = new emil\auth(get_env(), true);
+    $is_authorized = $auth->is_authorized($hdrs, $orgname, org_options_read($app->get('etc'), $orgname));
+    // Give it to siler
+    GraphQL\init($schema, ['app' => $app, 'is_authorized' => $is_authorized]);
+});
+
 $router->set404(function () {
     dbg('-- 404');
     e404();

@@ -4,7 +4,7 @@ use Siler\GraphQL;
 use Siler\Http\Request;
 use Siler\Http\Response;
 
-require 'vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 /*
 use GraphQL\Type\Definition\CustomScalarType;
 
