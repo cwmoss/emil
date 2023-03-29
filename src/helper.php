@@ -1,4 +1,5 @@
 <?php
+
 use Ahc\Jwt\JWT;
 use Ahc\Jwt\JWTException;
 
@@ -19,6 +20,23 @@ function e401($msg = 'unauthorized api request') {
     header('HTTP/1.1 401 Unauthorized');
     resp(['fail' => $msg]);
     exit;
+}
+
+if (!function_exists('d')) {
+    function d(...$args) {
+        echo '<pre>';
+        foreach ($args as $arg) {
+            print_r($arg);
+        }
+        echo '</pre>';
+    }
+}
+
+if (!function_exists('dd')) {
+    function dd(...$args) {
+        d(...$args);
+        die;
+    }
 }
 
 function dbg($txt, ...$vars) {
@@ -74,7 +92,7 @@ function gen_secret_hex($bytes = 32) {
 
 function gen_password($len = 15) {
     $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' .
-            '0123456789-!?@#$%#';
+        '0123456789-!?@#$%#';
 
     $str = '';
     $max = strlen($chars) - 1;

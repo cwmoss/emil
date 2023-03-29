@@ -14,6 +14,7 @@ function process($name, $data, $opts) {
         return array_merge($t, $parsed);
     }, $opts['types']);
 
+    // dd('templates', $templates);
     // only data-options
     $opts_data = array_blocklist($opts, 'api_key password transport frontparser base types');
 
@@ -21,7 +22,7 @@ function process($name, $data, $opts) {
     //    $templates[1]['d'], $opts);
     $templates = unfold_md_template($templates, $opts);
 
-    $data = array_merge($opts_data, $templates[1]['d'], $templates[0]['d'], $data);
+    $data = array_merge($opts_data, $templates[1]['d'] ?? [], $templates[0]['d'] ?? [], $data);
     $layout = name_layout($data['layout']);
 
     $templates = array_map(function ($t) use ($layout, $opts) {
