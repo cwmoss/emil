@@ -16,25 +16,6 @@ $mutations = [
         $api = $root['app']->make(api\email::class);
         dbg('+++ api', $api);
         return $api->_send_gql($args['template'], $args['recipient'], $args['data']);
-
-        $template = $args['template'];
-        $rec = $args['recipient'];
-        $data = $args['data'];
-
-        return [
-            'summary' => ['sent' => 1, 'failed' => 0],
-            'details' => [[
-                'email' => $rec['email'], //$rec, // $rec['email'],
-                'msg' => $root['org']->orgbase . ' ok',
-                'data' => []
-            ]]
-        ];
-
-        return [
-            'email' => $rec, // $rec['email'],
-            'status' => 'ok',
-            'msg' => ''
-        ];
     }
 ];
 
