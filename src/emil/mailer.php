@@ -2,9 +2,15 @@
 
 namespace emil;
 
-use PhpParser\Node\Stmt\Continue_;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer as symailer;
+
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
+
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class mailer {
     public $conf;
@@ -27,50 +33,10 @@ class mailer {
     */
     public function transport() {
         //var_dump($this->conf);
-        $cred = parse_url($this->conf['transport']);
-        //var_dump($cred);
-        //log_debug($cred);
-        if ($cred['scheme'] == 'smtp') {
-            $transport = new \Swift_SmtpTransport($cred['host'], $cred['port'] ? $cred['port'] : 25);
-
-            if ($cred['user']) {
-                $transport->setUsername($cred['user'])
-                    ->setPassword($cred['pass'])
-                    // ->setPort(465)
-                    ->setEncryption('ssl');
-            }
-
-            if ($this->conf['ssl']) {
-                $transport->setEncryption('ssl');
-            }
-
-            if ($this->conf['ssl_nocert']) {
-                $transport->setStreamOptions(['ssl' => ['allow_self_signed' => true, 'verify_peer' => false]]);
-            } else {
-                $sopts = [];
-                foreach ($this->conf as $skey => $val) {
-                    if (preg_match('/^ssl_(.*)$/', $skey, $mat)) {
-                        $sopts[$mat[1]] = $val;
-                    }
-                }
-                if ($sopts) {
-                    $transport->setStreamOptions(['ssl' => $sopts]);
-                }
-            }
-        } elseif ($cred['scheme'] == 'sendmail') {
-            $transport = new \Swift_SendmailTransport($cred['path'] . ' -t');
-        } elseif ($cred['scheme'] == 'php') {
-            /*
-                  achtung! php:// gibt es nicht mehr bei neueren versionen
-            */
-
-            $transport = new \Swift_MailTransport();
-        }
-
-        $transport = new \Swift_Mailer($transport);
-
-        //var_dump(self::$t);
-        return $transport;
+        // $cred = parse_url($this->conf['transport']);
+        $transport = Transport::fromDsn($this->conf['transport']);
+        $mailer = new symailer($transport);
+        return $mailer;
     }
 
     public function create_email($views, $data) {
@@ -78,33 +44,20 @@ class mailer {
         $hdrs = $this->header_from_data($data);
         // dd("headers", $hdrs);
         // dd($views);
-        foreach ($views as $type => $body) {
-            if (is_string($body) && !trim($body)) continue;
-            if ($type == 'txt') {
-                $m->text($body);
-            } elseif ($type == 'html') {
-                $repl = [];
-                if ($views['embeds']) {
-                    foreach ($views['embeds'] as $k => $embed) {
-                        if (!file_exists($embed)) {
-                            continue;
-                        }
-
-                        $img = \Swift_Image::fromPath($embed);
-                        $repl[$k] = 'cid:' . $img->getId();
-                        $m->attach($img);
+        if ($views['txt']) {
+            $m->text($views['txt']);
+        }
+        if ($views['html']) {
+            if ($views['embeds']) {
+                // dd('embeds:', $views['embeds']);
+                foreach ($views['embeds'] as $cid => $embed) {
+                    if (!file_exists($embed)) {
+                        continue;
                     }
+                    $m->addPart((new DataPart(new File($embed), $cid, 'image/png'))->asInline());
                 }
-
-                if ($repl) {
-                    $body = str_replace(array_keys($repl), $repl, $body);
-                }
-
-                //foreach(self::embed() as $cid => $embed){
-                //	$m->attach($embed);
-                //}
-                $m->html($body);
             }
+            $m->html($views['html']);
         }
 
         $this->set_headers($m, $hdrs);
@@ -126,60 +79,18 @@ class mailer {
 
 
     public function send($views, $data = []) {
-        //var_dump($views); exit;
-        $hdrs = $this->header_from_data($data);
-        dbg('mail headers', $hdrs);
+        $email = $this->create_email($views, $data);
+        //dd($email);
+        $mailer = $this->transport();
 
-        $m = new \Swift_Message;
-
-        foreach ($views as $type => $body) {
-            if ($type == 'txt') {
-                $m->addPart($body, 'text/plain');
-            } elseif ($type == 'html') {
-                $repl = [];
-                if ($views['embeds']) {
-                    foreach ($views['embeds'] as $k => $embed) {
-                        if (!file_exists($embed)) {
-                            continue;
-                        }
-
-                        $img = \Swift_Image::fromPath($embed);
-                        $repl[$k] = 'cid:' . $img->getId();
-                        $m->attach($img);
-                    }
-                }
-
-                if ($repl) {
-                    $body = str_replace(array_keys($repl), $repl, $body);
-                }
-
-                //foreach(self::embed() as $cid => $embed){
-                //	$m->attach($embed);
-                //}
-                $m->addPart($body, 'text/html');
-            }
+        try {
+            $mailer->send($email);
+        } catch (TransportExceptionInterface $e) {
+            // some error prevented the email sending; display an
+            // error message or try to resend the message
+            return $e->getMessage();
         }
-
-        $this->set_headers($m, $hdrs);
-        //print "headers OK\n";
-        if ($this->conf['pretend']) {
-            //log_info("[mail:pretend]\n". $m->toString());
-            return true;
-        }
-
-        $trans = $this->transport();
-        //var_dump($trans);
-        $ok = $trans->send($m, $failures);
-        //var_dump($ok);
-        //var_dump($trans);
-        //log_debug($trans);
-        if (!$ok) {
-            //log_warning("[mail] failures\n". $m->getHeaders()->toString());
-            //log_warning($failures);
-            return $failures;
-        } else {
-            return true;
-        }
+        return true;
     }
 
     public function header_from_data($data) {
@@ -188,21 +99,6 @@ class mailer {
             'from' => $data['from'],
             'subject' => $data['subject']
         ];
-    }
-
-    // $cid = $message->embed(Swift_Image::fromPath('image.png'));
-    public function embed($file = null) {
-        static $embeds = [];
-        // clear list
-        if (is_null($file)) {
-            $e = $embeds;
-            $embeds = [];
-            return $e;
-        }
-        $img = \Swift_Image::fromPath(self::$conf['basepath'] . '/' . $file);
-        $id = 'cid:' . $img->getId();
-        $embeds[$id] = $img;
-        return $id;
     }
 
     /*
@@ -216,7 +112,7 @@ class mailer {
         //print $headers->toString();
         //print_r($hdrs);
         foreach ($hdrs as $key => $h) {
-            if (!trim($h)) continue;
+            if (!$h || !trim($h)) continue;
             // $h = str_replace('#monitor', self::$vars['monitor'], $h);
             $hmail = join('-', array_map('ucfirst', explode('-', $key)));
             if (in_array($key, $addr_keys)) {

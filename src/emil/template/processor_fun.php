@@ -23,10 +23,10 @@ function process($name, $data, $opts) {
     $templates = unfold_md_template($templates, $opts);
 
     $data = array_merge($opts_data, $templates[1]['d'] ?? [], $templates[0]['d'] ?? [], $data);
-    $layout = name_layout($data['layout']);
+    $layout = name_layout($data['layout'] ?? null);
 
     $templates = array_map(function ($t) use ($layout, $opts) {
-        $src = add_layout_tag($t['b'], $t['c'], $layout, $t['t']);
+        $src = add_layout_tag($t['b'], $t['c'] ?? null, $layout, $t['t']);
         $t['c2'] = $src;
         $runner = compile($src, $t, $opts['helper']);
         $t['run'] = $runner;
@@ -59,7 +59,7 @@ function unfold_md_template($templates) {
 }
 
 function post_process($t, $opts) {
-    if ($t['t'] == 'html' && $t['pp'] == 'md') {
+    if ($t['t'] == 'html' && isset($t['pp']) && $t['pp'] == 'md') {
         $parts = explode('<!-- pp:md -->', $t['res']);
         if ($parts[2]) {
             $parts[1] = markdown($parts[1], $opts['markdown']);
@@ -146,7 +146,7 @@ function compile($src, $ctx, $helper = []) {
                 return load_partial($ctx['b'], $name, $ctx['t']);
             },
             'helpers' => array_merge([
-                'embed' => function ($context, $options) use ($processor) {
+                'embed' => function ($context, $options) {
                     // im compile step nix tun,
                     // erst im runstep wird die embedliste produziert
                     return $context;
@@ -165,10 +165,11 @@ function run($code, $data, $ctx) {
         'helpers' => [
             'embed' => function ($context, $options) use (&$embeds, $ctx) {
                 $file = $ctx['b'] . '/' . $context;
-                $hash = 'embed-' . md5($file) . '-embed';
+                // $hash = 'embed-' . md5($file) . '-embed';
+                $hash = md5($file);
                 $embeds[$hash] = $file;
                 dbg('++ embed runtime', $context, $hash, $file);
-                return $hash;
+                return 'cid:' . $hash;
             }
         ],
     ]);

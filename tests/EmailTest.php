@@ -5,9 +5,7 @@ declare(strict_types=1);
 error_reporting(\E_ALL);
 
 use PHPUnit\Framework\TestCase;
-use function emil\template\load_helper;
-use function emil\template\process;
-use function emil\template\process_string;
+use emil\template\processor;
 
 final class EmailTest extends TestCase {
     public $opts;
@@ -20,7 +18,7 @@ final class EmailTest extends TestCase {
             'markdown' => new \Parsedown(),
             'types' => ['md', 'txt', 'html']
         ];
-        $opts['helper'] = load_helper($opts);
+
         $this->opts = $opts;
 
         // dbg('++ md test', $template, $opts['helper']['markdown']('**hi**'));
@@ -30,21 +28,36 @@ final class EmailTest extends TestCase {
     }
 
     public function testBasicEmail(): void {
-        $data = ['name' => 'otto', 'what' => 'fun', 'from' => '"Support" office@acme.com'];
-        [$views, $data] = process('t1', $data, $this->opts);
-        $data['subject'] = process_string($data['subject'], $data, $this->opts['helper']);
+        $data = ['name' => 'otto', 'what' => 'fun', 'from' => '"Support" office@acme.com', 'to' => 'webmaster@localhost'];
+        $p = new processor('t1', $this->opts);
 
-        $email = $this->mailer->create_email([
-            'txt' => $views[0]['res'],
-            'html' => $views[1]['res'],
-            'embeds' => $views[1]['embeds']
-        ], $data);
+        $email = $this->mailer->create_email(...$p->run($data));
 
         $mime = $email->toString();
         $this->assertStringContainsString('Content-Type: text/plain', $mime);
         $this->assertStringContainsString('Subject: Welcome otto', $mime);
         $this->assertStringContainsString('From: Support <office@acme.com>', $mime);
         $this->assertStringContainsString("let's have fun", $mime);
+    }
+
+    public function testHtmlWithEmbed(): void {
+        $data = ['name' => 'otto', 'what' => 'fun', 'from' => '"Support" office@acme.com', 'to' => 'webmaster@localhost'];
+        $p = new processor('t2', $this->opts);
+
+        $email = $this->mailer->create_email(...$p->run($data));
+
+        $mime = $email->toString();
+        //         dd($mime);
+        $this->assertStringContainsString('Content-Type: multipart/related', $mime);
+        $this->assertStringContainsString('Content-Type: text/html', $mime);
+        $this->assertStringContainsString('Content-Type: image/png', $mime);
+        $this->assertStringContainsString('Content-Disposition: inline', $mime);
+        $this->assertStringContainsString('@symfony', $mime);
+        $this->assertStringContainsString('cid:', $mime);
+
+        $this->assertStringContainsString('Subject: Welcome otto', $mime);
+        $this->assertStringContainsString('From: Support <office@acme.com>', $mime);
+        $this->assertStringContainsString("Good Day", $mime);
     }
 
     public function xtestBasicTemplate(): void {
